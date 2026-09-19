@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="SmartSolar.Api/SmartSolar.Api.csproj" />
+  <Project Path="SmartSolar.Tests/SmartSolar.Tests.csproj" />
+</Solution>
