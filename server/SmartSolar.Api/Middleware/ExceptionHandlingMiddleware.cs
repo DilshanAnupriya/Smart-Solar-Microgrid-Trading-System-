@@ -2,16 +2,14 @@
  * File:        ExceptionHandlingMiddleware.cs
  * Project:     Smart Solar Microgrid Trading System (SE4040)
  * Layer:       Middleware
- * Author:      N. Jayasinghe (IT2XXXXXXX)
- * Created:     2026-09-20
- * Description: Catches every exception that escapes a controller and converts it
- *              into a consistent JSON error response. Expected failures use the
- *              status code carried by the exception; anything unexpected becomes
- *              a generic 500 so internal details are never sent to a client.
+ * Author:      N. Jayasinghe (IT)
+ * Created:     2026-09-19
+ * Description: Global error handler. Converts application exceptions into
+ *              ApiResponse JSON with the correct HTTP status code and hides
+ *              unexpected server errors behind a generic 500 message.
  */
 
-using System.Text.Json;
-using SmartSolar.Api.DTOs;
+using SmartSolar.Api.Common;
 using SmartSolar.Api.Exceptions;
 
 namespace SmartSolar.Api.Middleware;
@@ -22,46 +20,44 @@ public class ExceptionHandlingMiddleware
     private readonly ILogger<ExceptionHandlingMiddleware> _logger;
 
     /// <summary>
-    /// Receives the next middleware in the pipeline and the logger.
+    /// Receives the next middleware in the pipeline and a logger.
     /// </summary>
     public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
     {
-        // Keep both references for use on every request
+        // Store dependencies for use when handling requests
         _next = next;
         _logger = logger;
     }
 
     /// <summary>
-    /// Runs the rest of the pipeline and handles any exception it throws.
+    /// Runs the rest of the pipeline and catches any exception it throws.
     /// </summary>
     public async Task InvokeAsync(HttpContext context)
     {
-        // Let the request run normally, and only step in when it fails
+        // Expected errors return their own status; anything else returns 500
         try
         {
             await _next(context);
         }
         catch (AppException ex)
         {
-            // Expected failure: use the status code and message chosen by the service
-            _logger.LogWarning("Handled application error: {Message}", ex.Message);
-            await WriteErrorAsync(context, ex.StatusCode, ex.Message);
+            _logger.LogWarning("Handled application error ({StatusCode}): {Message}", ex.StatusCode, ex.Message);
+            await WriteErrorResponseAsync(context, ex.StatusCode, ex.Message);
         }
         catch (Exception ex)
         {
-            // Unexpected failure: log the detail for the developer, hide it from the client
-            _logger.LogError(ex, "Unhandled error while processing {Path}", context.Request.Path);
-            await WriteErrorAsync(context, StatusCodes.Status500InternalServerError,
-                "An unexpected error occurred. Please try again.");
+            _logger.LogError(ex, "Unhandled exception while processing {Path}", context.Request.Path);
+            await WriteErrorResponseAsync(context, StatusCodes.Status500InternalServerError,
+                "An unexpected error occurred. Please try again later.");
         }
     }
 
     /// <summary>
-    /// Writes the shared ApiErrorResponse shape to the HTTP response.
+    /// Writes an ApiResponse failure envelope as JSON with the given status code.
     /// </summary>
-    private static async Task WriteErrorAsync(HttpContext context, int statusCode, string message)
+    private static async Task WriteErrorResponseAsync(HttpContext context, int statusCode, string message)
     {
-        // Do nothing if the response has already started being sent to the client
+        // Cannot change the response once it has started streaming to the client
         if (context.Response.HasStarted)
         {
             return;
@@ -71,10 +67,7 @@ public class ExceptionHandlingMiddleware
         context.Response.StatusCode = statusCode;
         context.Response.ContentType = "application/json";
 
-        var payload = JsonSerializer.Serialize(
-            ApiErrorResponse.FromMessage(message),
-            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
-
-        await context.Response.WriteAsync(payload);
+        var response = ApiResponse<object>.Fail(message);
+        await context.Response.WriteAsJsonAsync(response);
     }
 }
