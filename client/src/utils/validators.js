@@ -97,15 +97,15 @@ export function validateUserForm(values, { requirePassword }) {
 }
 
 /**
- * Validates the login form and returns an errors object.
+ * Validates the login form and returns an errors object. The identifier may be
+ * an email address, a username or a phone number, so only its presence is
+ * checked here; the API decides which one it matches.
  */
 export function validateLoginForm(values) {
   const errors = {};
 
-  if (!values.email?.trim()) {
-    errors.email = 'Email is required.';
-  } else if (!EMAIL_PATTERN.test(values.email.trim())) {
-    errors.email = 'Enter a valid email address.';
+  if (!values.identifier?.trim()) {
+    errors.identifier = 'Enter your email, username or phone number.';
   }
 
   if (!values.password) {

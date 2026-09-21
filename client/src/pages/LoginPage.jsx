@@ -22,7 +22,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [values, setValues] = useState({ email: '', password: '' });
+  const [values, setValues] = useState({ identifier: '', password: '' });
   const [fieldErrors, setFieldErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -58,7 +58,7 @@ export default function LoginPage() {
     setSubmitting(true);
 
     try {
-      const user = await login(values.email.trim(), values.password);
+      const user = await login(values.identifier.trim(), values.password);
 
       // Greet the user by name; the toast survives the redirect because the
       // provider sits above the router
@@ -97,19 +97,23 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} noValidate>
             <div className="mb-3">
-              <label htmlFor="email" className="form-label">Email address</label>
+              <label htmlFor="identifier" className="form-label">
+                Email, username or phone number
+              </label>
               <input
-                id="email"
-                name="email"
-                type="email"
+                id="identifier"
+                name="identifier"
+                type="text"
                 autoComplete="username"
-                className={`form-control ${fieldErrors.email ? 'is-invalid' : ''}`}
-                placeholder="you@smartsolar.lk"
-                value={values.email}
+                className={`form-control ${fieldErrors.identifier ? 'is-invalid' : ''}`}
+                placeholder="you@smartsolar.lk, username or 0771234567"
+                value={values.identifier}
                 onChange={handleChange}
                 disabled={submitting}
               />
-              {fieldErrors.email && <div className="invalid-feedback">{fieldErrors.email}</div>}
+              {fieldErrors.identifier && (
+                <div className="invalid-feedback">{fieldErrors.identifier}</div>
+              )}
             </div>
 
             <div className="mb-4">

@@ -11,12 +11,13 @@
 import axiosClient from './axiosClient';
 
 /**
- * POST api/auth/login — exchanges credentials for a token.
+ * POST api/auth/login — exchanges credentials for a token. The identifier may
+ * be the user's email address, username or phone number.
  */
-export async function login(email, password) {
-  // The API decides whether the credentials are valid and whether the
-  // account is still active
-  const { data } = await axiosClient.post('/auth/login', { email, password });
+export async function login(identifier, password) {
+  // The API decides which field the identifier matched, whether the password
+  // is correct, and whether the account is still active
+  const { data } = await axiosClient.post('/auth/login', { identifier, password });
 
   return data;
 }

@@ -93,6 +93,49 @@ public class WebUserRepository : IWebUserRepository
     }
 
     /// <summary>
+    /// Returns a single user whose email address, username or phone number
+    /// matches the supplied login identifier, or null when nothing matches.
+    /// </summary>
+    public async Task<WebUser?> GetByIdentifierAsync(string identifier)
+    {
+        // Email and username are stored lowercase, so the text is normalised
+        // the same way before it is compared
+        var trimmed = identifier.Trim();
+        var normalised = trimmed.ToLowerInvariant();
+
+        var builder = Builders<WebUser>.Filter;
+
+        var filter = builder.Or(
+            builder.Eq(u => u.Email, normalised),
+            builder.Eq(u => u.Username, normalised),
+            builder.In(u => u.Phone, BuildPhoneCandidates(trimmed)));
+
+        return await _users.Find(filter).FirstOrDefaultAsync();
+    }
+
+    /// <summary>
+    /// Returns the equivalent ways of writing a phone number, so that a user
+    /// stored as "0771234567" can also sign in with "+94771234567".
+    /// </summary>
+    private static List<string> BuildPhoneCandidates(string identifier)
+    {
+        // The text itself is always tried; the other form is added when the
+        // text looks like a Sri Lankan number
+        var candidates = new List<string> { identifier };
+
+        if (System.Text.RegularExpressions.Regex.IsMatch(identifier, @"^0\d{9}$"))
+        {
+            candidates.Add("+94" + identifier[1..]);
+        }
+        else if (System.Text.RegularExpressions.Regex.IsMatch(identifier, @"^\+94\d{9}$"))
+        {
+            candidates.Add("0" + identifier[3..]);
+        }
+
+        return candidates;
+    }
+
+    /// <summary>
     /// Returns true when the email is already used by another user.
     /// </summary>
     public async Task<bool> EmailExistsAsync(string email, string? excludeId = null)

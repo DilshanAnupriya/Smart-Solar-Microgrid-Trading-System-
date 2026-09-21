@@ -35,12 +35,13 @@ export function AuthProvider({ children }) {
   }, []);
 
   /**
-   * Signs in, stores the token, and returns the user so the caller can
-   * redirect to the home page that matches their role.
+   * Signs in with an email address, username or phone number, stores the
+   * token, and returns the user so the caller can redirect to the home page
+   * that matches their role.
    */
-  const login = useCallback(async (email, password) => {
+  const login = useCallback(async (identifier, password) => {
     // The API performs the actual credential and status checks
-    const result = await authApi.login(email, password);
+    const result = await authApi.login(identifier, password);
 
     localStorage.setItem(STORAGE_KEYS.TOKEN, result.token);
     localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(result.user));

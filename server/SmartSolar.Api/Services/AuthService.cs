@@ -43,14 +43,16 @@ public class AuthService : IAuthService
     /// </summary>
     public async Task<LoginResponseDto> LoginAsync(LoginRequestDto dto)
     {
-        // Look the account up by email; a missing account is handled below
-        var user = await _repository.GetByEmailAsync(dto.Email);
+        // The identifier may be an email address, a username or a phone number;
+        // the repository decides which one it matched
+        var user = await _repository.GetByIdentifierAsync(dto.Identifier);
 
-        // Business rule: an unknown email and a wrong password must produce the
-        // exact same message, so an attacker cannot discover which emails exist
+        // Business rule: an unknown account and a wrong password must produce
+        // the exact same message, so an attacker cannot discover which emails,
+        // usernames or phone numbers exist
         if (user is null || !_passwordHasher.Verify(dto.Password, user.PasswordHash))
         {
-            throw new InvalidCredentialsException("Invalid email or password.");
+            throw new InvalidCredentialsException("Invalid credentials. Please check your details and try again.");
         }
 
         // Business rule: a deactivated account may not sign in, even with the

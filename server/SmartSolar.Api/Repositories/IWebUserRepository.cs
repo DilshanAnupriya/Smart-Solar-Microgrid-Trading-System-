@@ -31,6 +31,12 @@ public interface IWebUserRepository
     Task<WebUser?> GetByEmailAsync(string email);
 
     /// <summary>
+    /// Returns a single user whose email address, username or phone number
+    /// matches the supplied login identifier, or null when nothing matches.
+    /// </summary>
+    Task<WebUser?> GetByIdentifierAsync(string identifier);
+
+    /// <summary>
     /// Returns true when the email is already used by another user.
     /// </summary>
     Task<bool> EmailExistsAsync(string email, string? excludeId = null);
