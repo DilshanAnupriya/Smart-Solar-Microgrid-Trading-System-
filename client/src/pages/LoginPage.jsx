@@ -11,19 +11,19 @@
 
 import { useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
-import ErrorAlert from '../components/ErrorAlert';
 import { useAuth } from '../auth/useAuth';
+import { useToast } from '../toast/useToast';
 import { canRoleAccess, homePathFor } from '../utils/navigation';
 import { validateLoginForm } from '../utils/validators';
 
 export default function LoginPage() {
   const { isAuthenticated, user, login } = useAuth();
+  const { showError } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
 
   const [values, setValues] = useState({ email: '', password: '' });
   const [fieldErrors, setFieldErrors] = useState({});
-  const [formError, setFormError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -56,7 +56,6 @@ export default function LoginPage() {
     if (Object.keys(errors).length > 0) return;
 
     setSubmitting(true);
-    setFormError('');
 
     try {
       const user = await login(values.email.trim(), values.password);
@@ -74,8 +73,9 @@ export default function LoginPage() {
       // the administration dashboard, Grid Operators get the operations home
       navigate(homePathFor(user.role), { replace: true });
     } catch (error) {
-      // The API returns 401 for bad credentials and 403 for a deactivated account
-      setFormError(error.message);
+      // The API returns 401 for bad credentials and 403 for a deactivated
+      // account; both are shown as a notification in the bottom left corner
+      showError(error.message);
     } finally {
       setSubmitting(false);
     }
@@ -90,8 +90,6 @@ export default function LoginPage() {
             <h1 className="h4 fw-semibold mb-1">Smart Solar Microgrid</h1>
             <p className="text-secondary small mb-0">Sign in to the management console</p>
           </div>
-
-          <ErrorAlert message={formError} onDismiss={() => setFormError('')} />
 
           <form onSubmit={handleSubmit} noValidate>
             <div className="mb-3">

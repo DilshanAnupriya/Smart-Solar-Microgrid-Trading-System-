@@ -13,9 +13,9 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import ErrorAlert from '../../components/ErrorAlert';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import PageHeader from '../../components/PageHeader';
+import { useToast } from '../../toast/useToast';
 import { createUser, getUserById, updateUser } from '../../api/usersApi';
 import { ROLE_OPTIONS, ROLES } from '../../utils/constants';
 import { validateUserForm } from '../../utils/validators';
@@ -30,6 +30,7 @@ const EMPTY_FORM = {
 
 export default function UserFormPage() {
   const { id } = useParams();
+  const { showSuccess, showError } = useToast();
   const navigate = useNavigate();
 
   // The presence of an id in the address decides create mode from edit mode
@@ -37,7 +38,6 @@ export default function UserFormPage() {
 
   const [values, setValues] = useState(EMPTY_FORM);
   const [fieldErrors, setFieldErrors] = useState({});
-  const [formError, setFormError] = useState('');
   const [loading, setLoading] = useState(isEditMode);
   const [submitting, setSubmitting] = useState(false);
 
@@ -47,7 +47,6 @@ export default function UserFormPage() {
   const loadUser = useCallback(async () => {
     // Only runs in edit mode; create mode starts from a blank form
     setLoading(true);
-    setFormError('');
 
     try {
       const existing = await getUserById(id);
@@ -60,11 +59,11 @@ export default function UserFormPage() {
         confirmPassword: '',
       });
     } catch (fetchError) {
-      setFormError(fetchError.message);
+      showError(fetchError.message);
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  }, [id, showError]);
 
   useEffect(() => {
     if (isEditMode) loadUser();
@@ -94,7 +93,6 @@ export default function UserFormPage() {
     if (Object.keys(errors).length > 0) return;
 
     setSubmitting(true);
-    setFormError('');
 
     try {
       if (isEditMode) {
@@ -103,6 +101,8 @@ export default function UserFormPage() {
           email: values.email.trim(),
           role: values.role,
         });
+
+        showSuccess(`${values.fullName.trim()} has been updated.`);
       } else {
         await createUser({
           fullName: values.fullName.trim(),
@@ -110,16 +110,19 @@ export default function UserFormPage() {
           role: values.role,
           password: values.password,
         });
+
+        showSuccess(`${values.fullName.trim()} has been created.`);
       }
 
       navigate('/users', { replace: true });
     } catch (submitError) {
-      // 409 means the email is taken, so the message belongs on that field
+      // 409 means the email is taken, so the message is shown both on that
+      // field and as a notification in the bottom left corner
       if (submitError.status === 409) {
         setFieldErrors((previous) => ({ ...previous, email: submitError.message }));
-      } else {
-        setFormError(submitError.message);
       }
+
+      showError(submitError.message);
 
       // Any per-field messages returned by model validation are shown too
       const apiFieldErrors = submitError.fieldErrors || {};
@@ -151,8 +154,6 @@ export default function UserFormPage() {
             : 'Create a Backoffice or Grid Operator account'
         }
       />
-
-      <ErrorAlert message={formError} onDismiss={() => setFormError('')} />
 
       <div className="card border-0 shadow-sm">
         <div className="card-body p-4">
