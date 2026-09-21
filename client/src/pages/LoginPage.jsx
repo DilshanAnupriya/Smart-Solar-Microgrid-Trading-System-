@@ -18,7 +18,7 @@ import { validateLoginForm } from '../utils/validators';
 
 export default function LoginPage() {
   const { isAuthenticated, user, login } = useAuth();
-  const { showError } = useToast();
+  const { showSuccess, showError } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -59,6 +59,10 @@ export default function LoginPage() {
 
     try {
       const user = await login(values.email.trim(), values.password);
+
+      // Greet the user by name; the toast survives the redirect because the
+      // provider sits above the router
+      showSuccess(`Welcome back, ${user.fullName}.`);
 
       // Return the user to the page they originally asked for, but only when
       // their role is actually allowed to open it
