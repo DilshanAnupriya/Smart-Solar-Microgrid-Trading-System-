@@ -12,19 +12,19 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import ErrorAlert from '../components/ErrorAlert';
 import LoadingSpinner from '../components/LoadingSpinner';
 import PageHeader from '../components/PageHeader';
 import { useAuth } from '../auth/useAuth';
+import { useToast } from '../toast/useToast';
 import { getUsers } from '../api/usersApi';
 import { ROLES } from '../utils/constants';
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { showError } = useToast();
 
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
   /**
    * Loads every web user so the summary cards can be calculated.
@@ -32,17 +32,16 @@ export default function DashboardPage() {
   const loadUsers = useCallback(async () => {
     // The dashboard reads the same endpoint as the user list page
     setLoading(true);
-    setError('');
 
     try {
       const data = await getUsers();
       setUsers(data);
     } catch (fetchError) {
-      setError(fetchError.message);
+      showError(fetchError.message);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [showError]);
 
   useEffect(() => {
     loadUsers();
@@ -64,8 +63,6 @@ export default function DashboardPage() {
         title={`Welcome back, ${user?.fullName?.split(' ')[0] || 'there'}`}
         subtitle="Backoffice administration overview"
       />
-
-      <ErrorAlert message={error} onDismiss={() => setError('')} />
 
       {loading ? (
         <LoadingSpinner message="Loading dashboard…" />

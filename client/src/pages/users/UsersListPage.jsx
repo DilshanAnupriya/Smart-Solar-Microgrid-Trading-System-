@@ -14,24 +14,22 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ConfirmModal from '../../components/ConfirmModal';
 import EmptyState from '../../components/EmptyState';
-import ErrorAlert from '../../components/ErrorAlert';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import PageHeader from '../../components/PageHeader';
-import SuccessAlert from '../../components/SuccessAlert';
 import { RoleBadge, StatusBadge } from '../../components/Badges';
 import { useAuth } from '../../auth/useAuth';
+import { useToast } from '../../toast/useToast';
 import { activateUser, deactivateUser, getUsers } from '../../api/usersApi';
 import { ROLE_OPTIONS } from '../../utils/constants';
 import { formatDate } from '../../utils/formatters';
 
 export default function UsersListPage() {
   const { user: currentUser } = useAuth();
+  const { showSuccess, showError } = useToast();
   const navigate = useNavigate();
 
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
   // Filter state, applied by the API rather than in the browser
   const [search, setSearch] = useState('');
@@ -48,17 +46,16 @@ export default function UsersListPage() {
   const loadUsers = useCallback(async () => {
     // Called on first render, whenever a filter changes, and after each action
     setLoading(true);
-    setError('');
 
     try {
       const data = await getUsers({ role, status, search });
       setUsers(data);
     } catch (fetchError) {
-      setError(fetchError.message);
+      showError(fetchError.message);
     } finally {
       setLoading(false);
     }
-  }, [role, status, search]);
+  }, [role, status, search, showError]);
 
   // Debounced so typing in the search box does not fire a request per keystroke
   useEffect(() => {
@@ -74,15 +71,14 @@ export default function UsersListPage() {
     if (!pendingAction) return;
 
     setActionBusy(true);
-    setError('');
 
     try {
       if (pendingAction.type === 'deactivate') {
         await deactivateUser(pendingAction.user.id);
-        setSuccess(`${pendingAction.user.fullName} has been deactivated.`);
+        showSuccess(`${pendingAction.user.fullName} has been deactivated.`);
       } else {
         await activateUser(pendingAction.user.id);
-        setSuccess(`${pendingAction.user.fullName} has been reactivated.`);
+        showSuccess(`${pendingAction.user.fullName} has been reactivated.`);
       }
 
       setPendingAction(null);
@@ -90,7 +86,7 @@ export default function UsersListPage() {
       // Refetch so the table always reflects what the database now holds
       await loadUsers();
     } catch (actionError) {
-      setError(actionError.message);
+      showError(actionError.message);
       setPendingAction(null);
     } finally {
       setActionBusy(false);
@@ -108,9 +104,6 @@ export default function UsersListPage() {
           </Link>
         }
       />
-
-      <SuccessAlert message={success} onDismiss={() => setSuccess('')} />
-      <ErrorAlert message={error} onDismiss={() => setError('')} />
 
       <div className="card border-0 shadow-sm">
         <div className="card-body">

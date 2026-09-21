@@ -9,10 +9,15 @@
  *              the signed in user's role, so a Grid Operator never sees the
  *              Backoffice administration links. This is a convenience only —
  *              the Web API refuses the request regardless of what is shown.
+ *              Signing out asks for confirmation first, so the session is never
+ *              ended by an accidental click.
  */
 
+import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
+import ConfirmModal from './ConfirmModal';
 import { useAuth } from '../auth/useAuth';
+import { useToast } from '../toast/useToast';
 import { ROLE_LABELS, ROLES } from '../utils/constants';
 import { initialsOf } from '../utils/formatters';
 
@@ -27,9 +32,23 @@ const NAV_ITEMS = [
 
 export default function AppLayout() {
   const { user, logout, hasRole } = useAuth();
+  const { showSuccess } = useToast();
+
+  // True while the "are you sure?" sign out dialog is on screen
+  const [confirmingSignOut, setConfirmingSignOut] = useState(false);
 
   // Only the items this user's role is allowed to see are rendered
   const visibleItems = NAV_ITEMS.filter((item) => hasRole(item.roles));
+
+  /**
+   * Ends the session once the user has confirmed the dialog.
+   */
+  function handleConfirmSignOut() {
+    // Clearing the session sends the router back to the login page
+    setConfirmingSignOut(false);
+    logout();
+    showSuccess('You have been signed out.');
+  }
 
   return (
     <div className="app-shell">
@@ -64,7 +83,12 @@ export default function AppLayout() {
                 </div>
               </div>
 
-              <button type="button" className="btn btn-sm btn-outline-light" onClick={logout}>
+              {/* Opens the confirmation dialog instead of signing out at once */}
+              <button
+                type="button"
+                className="btn btn-sm btn-outline-light"
+                onClick={() => setConfirmingSignOut(true)}
+              >
                 Sign out
               </button>
             </div>
@@ -99,6 +123,17 @@ export default function AppLayout() {
           </main>
         </div>
       </div>
+
+      {/* Nothing happens unless the user chooses "Sign out" in this dialog */}
+      <ConfirmModal
+        show={confirmingSignOut}
+        title="Sign out"
+        message="Are you sure you want to sign out of the management console?"
+        confirmLabel="Sign out"
+        confirmVariant="danger"
+        onConfirm={handleConfirmSignOut}
+        onCancel={() => setConfirmingSignOut(false)}
+      />
     </div>
   );
 }

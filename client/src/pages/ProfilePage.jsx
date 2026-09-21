@@ -10,11 +10,10 @@
  */
 
 import { useState } from 'react';
-import ErrorAlert from '../components/ErrorAlert';
 import PageHeader from '../components/PageHeader';
-import SuccessAlert from '../components/SuccessAlert';
 import { RoleBadge, StatusBadge } from '../components/Badges';
 import { useAuth } from '../auth/useAuth';
+import { useToast } from '../toast/useToast';
 import { changePassword } from '../api/authApi';
 import { formatDateTime } from '../utils/formatters';
 import { validateChangePasswordForm } from '../utils/validators';
@@ -23,11 +22,10 @@ const EMPTY_FORM = { currentPassword: '', newPassword: '', confirmPassword: '' }
 
 export default function ProfilePage() {
   const { user } = useAuth();
+  const { showSuccess, showError } = useToast();
 
   const [values, setValues] = useState(EMPTY_FORM);
   const [fieldErrors, setFieldErrors] = useState({});
-  const [formError, setFormError] = useState('');
-  const [success, setSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   /**
@@ -52,17 +50,15 @@ export default function ProfilePage() {
     if (Object.keys(errors).length > 0) return;
 
     setSubmitting(true);
-    setFormError('');
-    setSuccess('');
 
     try {
       await changePassword(values.currentPassword, values.newPassword);
 
       // Clear the form so the typed passwords do not stay on screen
       setValues(EMPTY_FORM);
-      setSuccess('Your password has been changed.');
+      showSuccess('Your password has been changed.');
     } catch (submitError) {
-      setFormError(submitError.message);
+      showError(submitError.message);
     } finally {
       setSubmitting(false);
     }
@@ -102,9 +98,6 @@ export default function ProfilePage() {
           <div className="card border-0 shadow-sm h-100">
             <div className="card-body">
               <h2 className="h6 fw-semibold mb-3">Change password</h2>
-
-              <SuccessAlert message={success} onDismiss={() => setSuccess('')} />
-              <ErrorAlert message={formError} onDismiss={() => setFormError('')} />
 
               <form onSubmit={handleSubmit} noValidate>
                 <div className="mb-3">
