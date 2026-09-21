@@ -13,6 +13,15 @@
 // Simple pattern that catches obvious typing mistakes in an email address
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Letters, digits, dot, underscore and hyphen; 3 to 30 characters
+const USERNAME_PATTERN = /^[a-zA-Z0-9._-]{3,30}$/;
+
+// Sri Lankan NIC: 9 digits then V or X (old format), or 12 digits (new format)
+const NIC_PATTERN = /^(\d{9}[VvXx]|\d{12})$/;
+
+// Sri Lankan telephone number: 0 then 9 digits, or +94 then 9 digits
+const PHONE_PATTERN = /^(0\d{9}|\+94\d{9})$/;
+
 /**
  * Validates the create/edit user form and returns an errors object.
  */
@@ -30,6 +39,41 @@ export function validateUserForm(values, { requirePassword }) {
     errors.email = 'Email is required.';
   } else if (!EMAIL_PATTERN.test(values.email.trim())) {
     errors.email = 'Enter a valid email address.';
+  }
+
+  if (!values.username?.trim()) {
+    errors.username = 'Username is required.';
+  } else if (!USERNAME_PATTERN.test(values.username.trim())) {
+    errors.username = 'Use 3 to 30 letters, numbers, dot, underscore or hyphen.';
+  }
+
+  if (!values.nic?.trim()) {
+    errors.nic = 'NIC number is required.';
+  } else if (!NIC_PATTERN.test(values.nic.trim())) {
+    errors.nic = 'Enter 9 digits followed by V or X, or 12 digits.';
+  }
+
+  if (!values.phone?.trim()) {
+    errors.phone = 'Phone number is required.';
+  } else if (!PHONE_PATTERN.test(values.phone.trim())) {
+    errors.phone = 'Enter 10 digits starting with 0, or +94 followed by 9 digits.';
+  }
+
+  // The date of birth must be a real date in the past
+  if (!values.dateOfBirth) {
+    errors.dateOfBirth = 'Date of birth is required.';
+  } else {
+    const dob = new Date(values.dateOfBirth);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (Number.isNaN(dob.getTime())) {
+      errors.dateOfBirth = 'Enter a valid date.';
+    } else if (dob >= today) {
+      errors.dateOfBirth = 'Date of birth must be in the past.';
+    } else if (dob < new Date('1900-01-01')) {
+      errors.dateOfBirth = 'Date of birth must be on or after 1 January 1900.';
+    }
   }
 
   if (!values.role) {

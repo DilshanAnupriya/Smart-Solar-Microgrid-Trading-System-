@@ -36,6 +36,16 @@ public interface IWebUserRepository
     Task<bool> EmailExistsAsync(string email, string? excludeId = null);
 
     /// <summary>
+    /// Returns true when the username is already used by another user.
+    /// </summary>
+    Task<bool> UsernameExistsAsync(string username, string? excludeId = null);
+
+    /// <summary>
+    /// Returns true when the NIC number is already used by another user.
+    /// </summary>
+    Task<bool> NicExistsAsync(string nic, string? excludeId = null);
+
+    /// <summary>
     /// Inserts a new user document and returns it with the generated id.
     /// </summary>
     Task<WebUser> CreateAsync(WebUser user);
@@ -56,7 +66,7 @@ public interface IWebUserRepository
     Task<long> CountAsync();
 
     /// <summary>
-    /// Creates the unique index on the email field.
+    /// Creates the unique indexes on the email, username and NIC fields.
     /// </summary>
     Task EnsureIndexesAsync();
 }

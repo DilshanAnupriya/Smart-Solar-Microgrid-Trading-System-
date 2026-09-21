@@ -19,6 +19,18 @@ public class SeedAdminSettings
     // Login email of the first administrator
     public string Email { get; set; } = string.Empty;
 
+    // Short account name of the first administrator
+    public string Username { get; set; } = string.Empty;
+
+    // National Identity Card number of the first administrator
+    public string Nic { get; set; } = string.Empty;
+
+    // Contact telephone number of the first administrator
+    public string Phone { get; set; } = string.Empty;
+
+    // Date of birth in yyyy-MM-dd form
+    public DateTime? DateOfBirth { get; set; }
+
     // Plain password, hashed before it is stored (keep the real one in user-secrets)
     public string Password { get; set; } = string.Empty;
 }

@@ -162,9 +162,15 @@ export default function UsersListPage() {
             <div className="table-responsive">
               <table className="table table-hover align-middle mb-0">
                 <thead>
-                  <tr className="text-secondary small text-uppercase">
+                  {/* text-nowrap keeps the headings on one line; the wrapper
+                      scrolls sideways on a narrow screen */}
+                  <tr className="text-secondary small text-uppercase text-nowrap">
                     <th scope="col">Name</th>
                     <th scope="col">Email</th>
+                    <th scope="col">Username</th>
+                    <th scope="col">NIC</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Date of birth</th>
                     <th scope="col">Role</th>
                     <th scope="col">Status</th>
                     <th scope="col">Created</th>
@@ -185,6 +191,10 @@ export default function UsersListPage() {
                           {isSelf && <span className="badge text-bg-light border ms-2">You</span>}
                         </td>
                         <td className="text-secondary">{item.email}</td>
+                        <td className="text-secondary">{item.username || '—'}</td>
+                        <td className="text-secondary">{item.nic || '—'}</td>
+                        <td className="text-secondary">{item.phone || '—'}</td>
+                        <td className="text-secondary small text-nowrap">{formatDate(item.dateOfBirth)}</td>
                         <td><RoleBadge role={item.role} /></td>
                         <td><StatusBadge isActive={item.isActive} /></td>
                         <td className="text-secondary small">{formatDate(item.createdAt)}</td>

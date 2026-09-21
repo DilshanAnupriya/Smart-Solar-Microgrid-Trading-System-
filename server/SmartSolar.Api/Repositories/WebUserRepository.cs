@@ -50,13 +50,16 @@ public class WebUserRepository : IWebUserRepository
 
         if (!string.IsNullOrWhiteSpace(search))
         {
-            // Case insensitive "contains" match on either the name or the email
+            // Case insensitive "contains" match across every identifying field
             var pattern = new MongoDB.Bson.BsonRegularExpression(
                 System.Text.RegularExpressions.Regex.Escape(search.Trim()), "i");
 
             filter &= builder.Or(
                 builder.Regex(u => u.FullName, pattern),
-                builder.Regex(u => u.Email, pattern));
+                builder.Regex(u => u.Email, pattern),
+                builder.Regex(u => u.Username, pattern),
+                builder.Regex(u => u.Nic, pattern),
+                builder.Regex(u => u.Phone, pattern));
         }
 
         return await _users.Find(filter)
@@ -109,6 +112,44 @@ public class WebUserRepository : IWebUserRepository
     }
 
     /// <summary>
+    /// Returns true when the username is already used by another user.
+    /// </summary>
+    public async Task<bool> UsernameExistsAsync(string username, string? excludeId = null)
+    {
+        // Usernames are stored lowercase so the comparison is normalised too
+        var normalised = username.Trim().ToLowerInvariant();
+
+        var builder = Builders<WebUser>.Filter;
+        var filter = builder.Eq(u => u.Username, normalised);
+
+        if (!string.IsNullOrWhiteSpace(excludeId))
+        {
+            filter &= builder.Ne(u => u.Id, excludeId);
+        }
+
+        return await _users.Find(filter).AnyAsync();
+    }
+
+    /// <summary>
+    /// Returns true when the NIC number is already used by another user.
+    /// </summary>
+    public async Task<bool> NicExistsAsync(string nic, string? excludeId = null)
+    {
+        // NIC numbers are stored uppercase so "123456789v" matches "123456789V"
+        var normalised = nic.Trim().ToUpperInvariant();
+
+        var builder = Builders<WebUser>.Filter;
+        var filter = builder.Eq(u => u.Nic, normalised);
+
+        if (!string.IsNullOrWhiteSpace(excludeId))
+        {
+            filter &= builder.Ne(u => u.Id, excludeId);
+        }
+
+        return await _users.Find(filter).AnyAsync();
+    }
+
+    /// <summary>
     /// Inserts a new user document and returns it with the generated id.
     /// </summary>
     public async Task<WebUser> CreateAsync(WebUser user)
@@ -128,6 +169,10 @@ public class WebUserRepository : IWebUserRepository
         var update = Builders<WebUser>.Update
             .Set(u => u.FullName, user.FullName)
             .Set(u => u.Email, user.Email)
+            .Set(u => u.Username, user.Username)
+            .Set(u => u.Nic, user.Nic)
+            .Set(u => u.Phone, user.Phone)
+            .Set(u => u.DateOfBirth, user.DateOfBirth)
             .Set(u => u.Role, user.Role)
             .Set(u => u.PasswordHash, user.PasswordHash)
             .Set(u => u.UpdatedAt, user.UpdatedAt);
@@ -158,14 +203,28 @@ public class WebUserRepository : IWebUserRepository
     }
 
     /// <summary>
-    /// Creates the unique index on the email field.
+    /// Creates the unique indexes on the email, username and NIC fields.
     /// </summary>
     public async Task EnsureIndexesAsync()
     {
-        // A unique index makes the database itself reject a duplicate email
-        var keys = Builders<WebUser>.IndexKeys.Ascending(u => u.Email);
-        var options = new CreateIndexOptions { Unique = true, Name = "ux_webUsers_email" };
+        // A unique index makes the database itself reject a duplicate value.
+        // Username and NIC are sparse as well, so that user documents created
+        // before those fields existed do not clash with one another.
+        var models = new[]
+        {
+            new CreateIndexModel<WebUser>(
+                Builders<WebUser>.IndexKeys.Ascending(u => u.Email),
+                new CreateIndexOptions { Unique = true, Name = "ux_webUsers_email" }),
 
-        await _users.Indexes.CreateOneAsync(new CreateIndexModel<WebUser>(keys, options));
+            new CreateIndexModel<WebUser>(
+                Builders<WebUser>.IndexKeys.Ascending(u => u.Username),
+                new CreateIndexOptions { Unique = true, Sparse = true, Name = "ux_webUsers_username" }),
+
+            new CreateIndexModel<WebUser>(
+                Builders<WebUser>.IndexKeys.Ascending(u => u.Nic),
+                new CreateIndexOptions { Unique = true, Sparse = true, Name = "ux_webUsers_nic" })
+        };
+
+        await _users.Indexes.CreateManyAsync(models);
     }
 }
