@@ -237,6 +237,28 @@ public class WebUserRepository : IWebUserRepository
     }
 
     /// <summary>
+    /// Permanently removes a user document from the collection.
+    /// </summary>
+    public async Task DeleteAsync(string id)
+    {
+        // Unlike deactivation, this cannot be undone: the document is gone
+        await _users.DeleteOneAsync(u => u.Id == id);
+    }
+
+    /// <summary>
+    /// Counts the active users holding the given role, used to stop the last
+    /// Backoffice account from being removed.
+    /// </summary>
+    public async Task<long> CountActiveByRoleAsync(string role)
+    {
+        // Only active accounts count, because a deactivated one cannot sign in
+        var builder = Builders<WebUser>.Filter;
+        var filter = builder.Eq(u => u.Role, role) & builder.Eq(u => u.IsActive, true);
+
+        return await _users.CountDocumentsAsync(filter);
+    }
+
+    /// <summary>
     /// Counts all user documents, used to decide whether seeding is needed.
     /// </summary>
     public async Task<long> CountAsync()

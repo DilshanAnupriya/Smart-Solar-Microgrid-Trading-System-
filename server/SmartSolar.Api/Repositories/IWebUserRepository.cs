@@ -67,6 +67,17 @@ public interface IWebUserRepository
     Task SetActiveAsync(string id, bool isActive);
 
     /// <summary>
+    /// Permanently removes a user document from the collection.
+    /// </summary>
+    Task DeleteAsync(string id);
+
+    /// <summary>
+    /// Counts the active users holding the given role, used to stop the last
+    /// Backoffice account from being removed.
+    /// </summary>
+    Task<long> CountActiveByRoleAsync(string role);
+
+    /// <summary>
     /// Counts all user documents, used to decide whether seeding is needed.
     /// </summary>
     Task<long> CountAsync();

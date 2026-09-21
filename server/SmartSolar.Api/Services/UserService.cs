@@ -198,6 +198,37 @@ public class UserService : IUserService
     }
 
     /// <summary>
+    /// Permanently deletes an account.
+    /// </summary>
+    public async Task DeleteAsync(string id, string currentUserId)
+    {
+        // Business rule: a signed in user may not delete their own account,
+        // for the same reason they may not deactivate it
+        if (string.Equals(id, currentUserId, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new BusinessRuleException("You cannot delete your own account.");
+        }
+
+        var user = await _repository.GetByIdAsync(id)
+                   ?? throw new NotFoundException("User not found.");
+
+        // Business rule: the last active Backoffice account must survive,
+        // otherwise nobody could administer the system afterwards
+        if (user.Role == UserRoles.Backoffice && user.IsActive)
+        {
+            var activeBackoffice = await _repository.CountActiveByRoleAsync(UserRoles.Backoffice);
+
+            if (activeBackoffice <= 1)
+            {
+                throw new BusinessRuleException(
+                    "This is the last active Backoffice account and cannot be deleted.");
+            }
+        }
+
+        await _repository.DeleteAsync(id);
+    }
+
+    /// <summary>
     /// Checks that the email, username and NIC are not already taken by a
     /// different account, and reports the first clash it finds.
     /// </summary>

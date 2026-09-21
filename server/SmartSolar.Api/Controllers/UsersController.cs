@@ -125,6 +125,23 @@ public class UsersController : ControllerBase
     }
 
     /// <summary>
+    /// DELETE api/users/{id} — permanently removes an account.
+    /// Only Backoffice users reach this endpoint, because of the
+    /// [Authorize(Roles = "Backoffice")] attribute on this controller.
+    /// </summary>
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Delete(string id)
+    {
+        // The current user's id is passed so the service can refuse self-deletion
+        await _userService.DeleteAsync(id, GetCurrentUserId());
+
+        return NoContent();
+    }
+
+    /// <summary>
     /// Reads the signed in user's id out of the JWT claims.
     /// </summary>
     private string GetCurrentUserId()

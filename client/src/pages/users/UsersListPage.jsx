@@ -16,12 +16,36 @@ import ConfirmModal from '../../components/ConfirmModal';
 import EmptyState from '../../components/EmptyState';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import PageHeader from '../../components/PageHeader';
+import UserDetailsModal from '../../components/UserDetailsModal';
 import { RoleBadge, StatusBadge } from '../../components/Badges';
 import { useAuth } from '../../auth/useAuth';
 import { useToast } from '../../toast/useToast';
-import { activateUser, deactivateUser, getUsers } from '../../api/usersApi';
+import { activateUser, deactivateUser, deleteUser, getUsers } from '../../api/usersApi';
 import { ROLE_OPTIONS } from '../../utils/constants';
 import { formatDate } from '../../utils/formatters';
+
+// Wording of the confirmation dialog for each action the table can start
+const ACTION_TEXT = {
+  deactivate: {
+    title: 'Deactivate account',
+    message: (name) => `${name} will no longer be able to sign in. Continue?`,
+    confirmLabel: 'Deactivate',
+    variant: 'warning',
+  },
+  activate: {
+    title: 'Reactivate account',
+    message: (name) => `${name} will be able to sign in again. Continue?`,
+    confirmLabel: 'Activate',
+    variant: 'success',
+  },
+  delete: {
+    title: 'Delete account',
+    message: (name) =>
+      `${name} will be permanently removed. This cannot be undone. Continue?`,
+    confirmLabel: 'Delete',
+    variant: 'danger',
+  },
+};
 
 export default function UsersListPage() {
   const { user: currentUser } = useAuth();
@@ -36,9 +60,12 @@ export default function UsersListPage() {
   const [role, setRole] = useState('');
   const [status, setStatus] = useState('all');
 
-  // The account waiting for a confirmed activate/deactivate decision
+  // The account waiting for a confirmed activate, deactivate or delete decision
   const [pendingAction, setPendingAction] = useState(null);
   const [actionBusy, setActionBusy] = useState(false);
+
+  // The account whose full details are being viewed, or null when none is
+  const [viewingUser, setViewingUser] = useState(null);
 
   /**
    * Fetches the user list using the current filters.
@@ -76,6 +103,9 @@ export default function UsersListPage() {
       if (pendingAction.type === 'deactivate') {
         await deactivateUser(pendingAction.user.id);
         showSuccess(`${pendingAction.user.fullName} has been deactivated.`);
+      } else if (pendingAction.type === 'delete') {
+        await deleteUser(pendingAction.user.id);
+        showSuccess(`${pendingAction.user.fullName} has been deleted.`);
       } else {
         await activateUser(pendingAction.user.id);
         showSuccess(`${pendingAction.user.fullName} has been reactivated.`);
@@ -164,13 +194,11 @@ export default function UsersListPage() {
                 <thead>
                   {/* text-nowrap keeps the headings on one line; the wrapper
                       scrolls sideways on a narrow screen */}
+                  {/* Username, NIC, phone and date of birth are deliberately
+                      left out here; they are shown in the View dialog */}
                   <tr className="text-secondary small text-uppercase text-nowrap">
                     <th scope="col">Name</th>
                     <th scope="col">Email</th>
-                    <th scope="col">Username</th>
-                    <th scope="col">NIC</th>
-                    <th scope="col">Phone</th>
-                    <th scope="col">Date of birth</th>
                     <th scope="col">Role</th>
                     <th scope="col">Status</th>
                     <th scope="col">Created</th>
@@ -191,15 +219,19 @@ export default function UsersListPage() {
                           {isSelf && <span className="badge text-bg-light border ms-2">You</span>}
                         </td>
                         <td className="text-secondary">{item.email}</td>
-                        <td className="text-secondary">{item.username || '—'}</td>
-                        <td className="text-secondary">{item.nic || '—'}</td>
-                        <td className="text-secondary">{item.phone || '—'}</td>
-                        <td className="text-secondary small text-nowrap">{formatDate(item.dateOfBirth)}</td>
                         <td><RoleBadge role={item.role} /></td>
                         <td><StatusBadge isActive={item.isActive} /></td>
                         <td className="text-secondary small">{formatDate(item.createdAt)}</td>
                         <td className="text-end">
                           <div className="btn-group btn-group-sm">
+                            <button
+                              type="button"
+                              className="btn btn-outline-primary"
+                              onClick={() => setViewingUser(item)}
+                            >
+                              View
+                            </button>
+
                             <button
                               type="button"
                               className="btn btn-outline-secondary"
@@ -211,7 +243,7 @@ export default function UsersListPage() {
                             {item.isActive ? (
                               <button
                                 type="button"
-                                className="btn btn-outline-danger"
+                                className="btn btn-outline-warning"
                                 disabled={isSelf}
                                 title={isSelf ? 'You cannot deactivate your own account' : undefined}
                                 onClick={() => setPendingAction({ type: 'deactivate', user: item })}
@@ -227,6 +259,18 @@ export default function UsersListPage() {
                                 Activate
                               </button>
                             )}
+
+                            {/* Deleting cannot be undone, so it is the last
+                                button and always asks for confirmation */}
+                            <button
+                              type="button"
+                              className="btn btn-outline-danger"
+                              disabled={isSelf}
+                              title={isSelf ? 'You cannot delete your own account' : undefined}
+                              onClick={() => setPendingAction({ type: 'delete', user: item })}
+                            >
+                              Delete
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -242,16 +286,26 @@ export default function UsersListPage() {
       <ConfirmModal
         show={Boolean(pendingAction)}
         busy={actionBusy}
-        title={pendingAction?.type === 'deactivate' ? 'Deactivate account' : 'Reactivate account'}
+        title={ACTION_TEXT[pendingAction?.type]?.title ?? ''}
         message={
-          pendingAction?.type === 'deactivate'
-            ? `${pendingAction?.user.fullName} will no longer be able to sign in. Continue?`
-            : `${pendingAction?.user.fullName} will be able to sign in again. Continue?`
+          pendingAction
+            ? ACTION_TEXT[pendingAction.type].message(pendingAction.user.fullName)
+            : ''
         }
-        confirmLabel={pendingAction?.type === 'deactivate' ? 'Deactivate' : 'Activate'}
-        confirmVariant={pendingAction?.type === 'deactivate' ? 'danger' : 'success'}
+        confirmLabel={ACTION_TEXT[pendingAction?.type]?.confirmLabel ?? 'Confirm'}
+        confirmVariant={ACTION_TEXT[pendingAction?.type]?.variant ?? 'danger'}
         onConfirm={handleConfirmAction}
         onCancel={() => setPendingAction(null)}
+      />
+
+      {/* Read only dialog holding every detail of the selected account */}
+      <UserDetailsModal
+        user={viewingUser}
+        onClose={() => setViewingUser(null)}
+        onEdit={(user) => {
+          setViewingUser(null);
+          navigate(`/users/${user.id}/edit`);
+        }}
       />
     </>
   );
