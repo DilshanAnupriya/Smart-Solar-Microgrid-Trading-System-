@@ -68,3 +68,12 @@ export async function deactivateUser(id) {
 export async function activateUser(id) {
   await axiosClient.patch(`/users/${id}/activate`);
 }
+
+/**
+ * DELETE api/users/{id} — permanently removes an account.
+ */
+export async function deleteUser(id) {
+  // The API refuses this for the signed in user's own account and for the
+  // last active Backoffice account
+  await axiosClient.delete(`/users/${id}`);
+}

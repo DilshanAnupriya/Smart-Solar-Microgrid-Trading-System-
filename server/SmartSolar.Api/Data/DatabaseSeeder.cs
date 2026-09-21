@@ -73,6 +73,17 @@ public class DatabaseSeeder
         {
             FullName = string.IsNullOrWhiteSpace(_settings.FullName) ? "System Administrator" : _settings.FullName,
             Email = _settings.Email.Trim().ToLowerInvariant(),
+
+            // Fall back to sensible defaults so the seed never fails validation
+            Username = string.IsNullOrWhiteSpace(_settings.Username)
+                ? "admin"
+                : _settings.Username.Trim().ToLowerInvariant(),
+            Nic = _settings.Nic.Trim().ToUpperInvariant(),
+            Phone = _settings.Phone.Trim(),
+            DateOfBirth = _settings.DateOfBirth.HasValue
+                ? DateTime.SpecifyKind(_settings.DateOfBirth.Value.Date, DateTimeKind.Utc)
+                : null,
+
             PasswordHash = _passwordHasher.Hash(_settings.Password),
             Role = UserRoles.Backoffice,
             IsActive = true,

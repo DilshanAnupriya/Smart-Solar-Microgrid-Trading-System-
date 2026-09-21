@@ -15,7 +15,7 @@ import { RoleBadge, StatusBadge } from '../components/Badges';
 import { useAuth } from '../auth/useAuth';
 import { useToast } from '../toast/useToast';
 import { changePassword } from '../api/authApi';
-import { formatDateTime } from '../utils/formatters';
+import { formatDate, formatDateTime } from '../utils/formatters';
 import { validateChangePasswordForm } from '../utils/validators';
 
 const EMPTY_FORM = { currentPassword: '', newPassword: '', confirmPassword: '' };
@@ -80,6 +80,18 @@ export default function ProfilePage() {
 
                 <dt className="col-5 text-secondary fw-normal">Email</dt>
                 <dd className="col-7">{user?.email}</dd>
+
+                <dt className="col-5 text-secondary fw-normal">Username</dt>
+                <dd className="col-7">{user?.username || '—'}</dd>
+
+                <dt className="col-5 text-secondary fw-normal">NIC number</dt>
+                <dd className="col-7">{user?.nic || '—'}</dd>
+
+                <dt className="col-5 text-secondary fw-normal">Phone</dt>
+                <dd className="col-7">{user?.phone || '—'}</dd>
+
+                <dt className="col-5 text-secondary fw-normal">Date of birth</dt>
+                <dd className="col-7">{formatDate(user?.dateOfBirth)}</dd>
 
                 <dt className="col-5 text-secondary fw-normal">Role</dt>
                 <dd className="col-7"><RoleBadge role={user?.role} /></dd>

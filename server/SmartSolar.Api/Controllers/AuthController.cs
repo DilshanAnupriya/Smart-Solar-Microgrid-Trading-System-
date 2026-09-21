@@ -33,7 +33,8 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// POST api/auth/login — verifies credentials and returns a JWT.
+    /// POST api/auth/login — verifies credentials and returns a JWT. The
+    /// identifier may be the user's email address, username or phone number.
     /// </summary>
     [HttpPost("login")]
     [AllowAnonymous]

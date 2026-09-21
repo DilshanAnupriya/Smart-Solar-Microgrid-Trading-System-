@@ -23,10 +23,28 @@ import { validateUserForm } from '../../utils/validators';
 const EMPTY_FORM = {
   fullName: '',
   email: '',
+  username: '',
+  nic: '',
+  phone: '',
+  dateOfBirth: '',
   role: ROLES.GRID_OPERATOR,
   password: '',
   confirmPassword: '',
 };
+
+/**
+ * Turns the ISO date the API returns into the yyyy-MM-dd value a date input
+ * expects, and returns an empty string when there is no date.
+ */
+function toDateInputValue(value) {
+  // Older accounts may have no date of birth stored at all
+  if (!value) return '';
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+
+  return date.toISOString().slice(0, 10);
+}
 
 export default function UserFormPage() {
   const { id } = useParams();
@@ -54,6 +72,10 @@ export default function UserFormPage() {
       setValues({
         fullName: existing.fullName,
         email: existing.email,
+        username: existing.username || '',
+        nic: existing.nic || '',
+        phone: existing.phone || '',
+        dateOfBirth: toDateInputValue(existing.dateOfBirth),
         role: existing.role,
         password: '',
         confirmPassword: '',
@@ -95,31 +117,41 @@ export default function UserFormPage() {
     setSubmitting(true);
 
     try {
+      // The fields shared by create and edit are built once
+      const common = {
+        fullName: values.fullName.trim(),
+        email: values.email.trim(),
+        username: values.username.trim(),
+        nic: values.nic.trim(),
+        phone: values.phone.trim(),
+        dateOfBirth: values.dateOfBirth,
+        role: values.role,
+      };
+
       if (isEditMode) {
-        await updateUser(id, {
-          fullName: values.fullName.trim(),
-          email: values.email.trim(),
-          role: values.role,
-        });
+        await updateUser(id, common);
 
         showSuccess(`${values.fullName.trim()} has been updated.`);
       } else {
-        await createUser({
-          fullName: values.fullName.trim(),
-          email: values.email.trim(),
-          role: values.role,
-          password: values.password,
-        });
+        await createUser({ ...common, password: values.password });
 
         showSuccess(`${values.fullName.trim()} has been created.`);
       }
 
       navigate('/users', { replace: true });
     } catch (submitError) {
-      // 409 means the email is taken, so the message is shown both on that
-      // field and as a notification in the bottom left corner
+      // A 409 means one of the unique values is taken; the message says which,
+      // so it is placed on that field as well as shown as a notification
       if (submitError.status === 409) {
-        setFieldErrors((previous) => ({ ...previous, email: submitError.message }));
+        const message = submitError.message.toLowerCase();
+
+        const clashingField = message.includes('username')
+          ? 'username'
+          : message.includes('nic')
+            ? 'nic'
+            : 'email';
+
+        setFieldErrors((previous) => ({ ...previous, [clashingField]: submitError.message }));
       }
 
       showError(submitError.message);
@@ -187,6 +219,67 @@ export default function UserFormPage() {
                   disabled={submitting}
                 />
                 {fieldErrors.email && <div className="invalid-feedback">{fieldErrors.email}</div>}
+              </div>
+
+              <div className="col-md-6">
+                <label htmlFor="username" className="form-label">Username</label>
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  className={`form-control ${fieldErrors.username ? 'is-invalid' : ''}`}
+                  placeholder="e.g. nimali.perera"
+                  value={values.username}
+                  onChange={handleChange}
+                  disabled={submitting}
+                />
+                {fieldErrors.username && <div className="invalid-feedback">{fieldErrors.username}</div>}
+              </div>
+
+              <div className="col-md-6">
+                <label htmlFor="nic" className="form-label">NIC number</label>
+                <input
+                  id="nic"
+                  name="nic"
+                  type="text"
+                  className={`form-control ${fieldErrors.nic ? 'is-invalid' : ''}`}
+                  placeholder="199012345678 or 901234567V"
+                  value={values.nic}
+                  onChange={handleChange}
+                  disabled={submitting}
+                />
+                {fieldErrors.nic && <div className="invalid-feedback">{fieldErrors.nic}</div>}
+              </div>
+
+              <div className="col-md-6">
+                <label htmlFor="phone" className="form-label">Phone number</label>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  className={`form-control ${fieldErrors.phone ? 'is-invalid' : ''}`}
+                  placeholder="0771234567"
+                  value={values.phone}
+                  onChange={handleChange}
+                  disabled={submitting}
+                />
+                {fieldErrors.phone && <div className="invalid-feedback">{fieldErrors.phone}</div>}
+              </div>
+
+              <div className="col-md-6">
+                <label htmlFor="dateOfBirth" className="form-label">Date of birth</label>
+                <input
+                  id="dateOfBirth"
+                  name="dateOfBirth"
+                  type="date"
+                  className={`form-control ${fieldErrors.dateOfBirth ? 'is-invalid' : ''}`}
+                  value={values.dateOfBirth}
+                  onChange={handleChange}
+                  disabled={submitting}
+                />
+                {fieldErrors.dateOfBirth && (
+                  <div className="invalid-feedback">{fieldErrors.dateOfBirth}</div>
+                )}
               </div>
 
               <div className="col-md-6">

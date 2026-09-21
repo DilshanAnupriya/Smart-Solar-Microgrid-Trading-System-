@@ -43,4 +43,10 @@ public interface IUserService
     /// Reactivates a previously deactivated account.
     /// </summary>
     Task ActivateAsync(string id);
+
+    /// <summary>
+    /// Permanently deletes an account. Only a Backoffice officer may do this,
+    /// which is enforced by the [Authorize] attribute on the controller.
+    /// </summary>
+    Task DeleteAsync(string id, string currentUserId);
 }

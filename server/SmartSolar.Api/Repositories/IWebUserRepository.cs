@@ -31,9 +31,25 @@ public interface IWebUserRepository
     Task<WebUser?> GetByEmailAsync(string email);
 
     /// <summary>
+    /// Returns a single user whose email address, username or phone number
+    /// matches the supplied login identifier, or null when nothing matches.
+    /// </summary>
+    Task<WebUser?> GetByIdentifierAsync(string identifier);
+
+    /// <summary>
     /// Returns true when the email is already used by another user.
     /// </summary>
     Task<bool> EmailExistsAsync(string email, string? excludeId = null);
+
+    /// <summary>
+    /// Returns true when the username is already used by another user.
+    /// </summary>
+    Task<bool> UsernameExistsAsync(string username, string? excludeId = null);
+
+    /// <summary>
+    /// Returns true when the NIC number is already used by another user.
+    /// </summary>
+    Task<bool> NicExistsAsync(string nic, string? excludeId = null);
 
     /// <summary>
     /// Inserts a new user document and returns it with the generated id.
@@ -51,12 +67,23 @@ public interface IWebUserRepository
     Task SetActiveAsync(string id, bool isActive);
 
     /// <summary>
+    /// Permanently removes a user document from the collection.
+    /// </summary>
+    Task DeleteAsync(string id);
+
+    /// <summary>
+    /// Counts the active users holding the given role, used to stop the last
+    /// Backoffice account from being removed.
+    /// </summary>
+    Task<long> CountActiveByRoleAsync(string role);
+
+    /// <summary>
     /// Counts all user documents, used to decide whether seeding is needed.
     /// </summary>
     Task<long> CountAsync();
 
     /// <summary>
-    /// Creates the unique index on the email field.
+    /// Creates the unique indexes on the email, username and NIC fields.
     /// </summary>
     Task EnsureIndexesAsync();
 }

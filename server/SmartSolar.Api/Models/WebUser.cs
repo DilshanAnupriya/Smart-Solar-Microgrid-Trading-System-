@@ -30,6 +30,24 @@ public class WebUser
     [BsonElement("email")]
     public string Email { get; set; } = string.Empty;
 
+    // Short account name, stored lowercase and unique across all web users
+    [BsonElement("username")]
+    public string Username { get; set; } = string.Empty;
+
+    // National Identity Card number, unique across all web users
+    [BsonElement("nic")]
+    public string Nic { get; set; } = string.Empty;
+
+    // Contact telephone number
+    [BsonElement("phone")]
+    public string Phone { get; set; } = string.Empty;
+
+    // Date of birth, stored in UTC. Nullable so that user documents created
+    // before this field existed still load correctly.
+    [BsonElement("dateOfBirth")]
+    [BsonIgnoreIfNull]
+    public DateTime? DateOfBirth { get; set; }
+
     // BCrypt hash of the password; never returned to any client
     [BsonElement("passwordHash")]
     public string PasswordHash { get; set; } = string.Empty;

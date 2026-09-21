@@ -50,13 +50,16 @@ public class WebUserRepository : IWebUserRepository
 
         if (!string.IsNullOrWhiteSpace(search))
         {
-            // Case insensitive "contains" match on either the name or the email
+            // Case insensitive "contains" match across every identifying field
             var pattern = new MongoDB.Bson.BsonRegularExpression(
                 System.Text.RegularExpressions.Regex.Escape(search.Trim()), "i");
 
             filter &= builder.Or(
                 builder.Regex(u => u.FullName, pattern),
-                builder.Regex(u => u.Email, pattern));
+                builder.Regex(u => u.Email, pattern),
+                builder.Regex(u => u.Username, pattern),
+                builder.Regex(u => u.Nic, pattern),
+                builder.Regex(u => u.Phone, pattern));
         }
 
         return await _users.Find(filter)
@@ -90,6 +93,49 @@ public class WebUserRepository : IWebUserRepository
     }
 
     /// <summary>
+    /// Returns a single user whose email address, username or phone number
+    /// matches the supplied login identifier, or null when nothing matches.
+    /// </summary>
+    public async Task<WebUser?> GetByIdentifierAsync(string identifier)
+    {
+        // Email and username are stored lowercase, so the text is normalised
+        // the same way before it is compared
+        var trimmed = identifier.Trim();
+        var normalised = trimmed.ToLowerInvariant();
+
+        var builder = Builders<WebUser>.Filter;
+
+        var filter = builder.Or(
+            builder.Eq(u => u.Email, normalised),
+            builder.Eq(u => u.Username, normalised),
+            builder.In(u => u.Phone, BuildPhoneCandidates(trimmed)));
+
+        return await _users.Find(filter).FirstOrDefaultAsync();
+    }
+
+    /// <summary>
+    /// Returns the equivalent ways of writing a phone number, so that a user
+    /// stored as "0771234567" can also sign in with "+94771234567".
+    /// </summary>
+    private static List<string> BuildPhoneCandidates(string identifier)
+    {
+        // The text itself is always tried; the other form is added when the
+        // text looks like a Sri Lankan number
+        var candidates = new List<string> { identifier };
+
+        if (System.Text.RegularExpressions.Regex.IsMatch(identifier, @"^0\d{9}$"))
+        {
+            candidates.Add("+94" + identifier[1..]);
+        }
+        else if (System.Text.RegularExpressions.Regex.IsMatch(identifier, @"^\+94\d{9}$"))
+        {
+            candidates.Add("0" + identifier[3..]);
+        }
+
+        return candidates;
+    }
+
+    /// <summary>
     /// Returns true when the email is already used by another user.
     /// </summary>
     public async Task<bool> EmailExistsAsync(string email, string? excludeId = null)
@@ -99,6 +145,44 @@ public class WebUserRepository : IWebUserRepository
 
         var builder = Builders<WebUser>.Filter;
         var filter = builder.Eq(u => u.Email, normalised);
+
+        if (!string.IsNullOrWhiteSpace(excludeId))
+        {
+            filter &= builder.Ne(u => u.Id, excludeId);
+        }
+
+        return await _users.Find(filter).AnyAsync();
+    }
+
+    /// <summary>
+    /// Returns true when the username is already used by another user.
+    /// </summary>
+    public async Task<bool> UsernameExistsAsync(string username, string? excludeId = null)
+    {
+        // Usernames are stored lowercase so the comparison is normalised too
+        var normalised = username.Trim().ToLowerInvariant();
+
+        var builder = Builders<WebUser>.Filter;
+        var filter = builder.Eq(u => u.Username, normalised);
+
+        if (!string.IsNullOrWhiteSpace(excludeId))
+        {
+            filter &= builder.Ne(u => u.Id, excludeId);
+        }
+
+        return await _users.Find(filter).AnyAsync();
+    }
+
+    /// <summary>
+    /// Returns true when the NIC number is already used by another user.
+    /// </summary>
+    public async Task<bool> NicExistsAsync(string nic, string? excludeId = null)
+    {
+        // NIC numbers are stored uppercase so "123456789v" matches "123456789V"
+        var normalised = nic.Trim().ToUpperInvariant();
+
+        var builder = Builders<WebUser>.Filter;
+        var filter = builder.Eq(u => u.Nic, normalised);
 
         if (!string.IsNullOrWhiteSpace(excludeId))
         {
@@ -128,6 +212,10 @@ public class WebUserRepository : IWebUserRepository
         var update = Builders<WebUser>.Update
             .Set(u => u.FullName, user.FullName)
             .Set(u => u.Email, user.Email)
+            .Set(u => u.Username, user.Username)
+            .Set(u => u.Nic, user.Nic)
+            .Set(u => u.Phone, user.Phone)
+            .Set(u => u.DateOfBirth, user.DateOfBirth)
             .Set(u => u.Role, user.Role)
             .Set(u => u.PasswordHash, user.PasswordHash)
             .Set(u => u.UpdatedAt, user.UpdatedAt);
@@ -149,6 +237,28 @@ public class WebUserRepository : IWebUserRepository
     }
 
     /// <summary>
+    /// Permanently removes a user document from the collection.
+    /// </summary>
+    public async Task DeleteAsync(string id)
+    {
+        // Unlike deactivation, this cannot be undone: the document is gone
+        await _users.DeleteOneAsync(u => u.Id == id);
+    }
+
+    /// <summary>
+    /// Counts the active users holding the given role, used to stop the last
+    /// Backoffice account from being removed.
+    /// </summary>
+    public async Task<long> CountActiveByRoleAsync(string role)
+    {
+        // Only active accounts count, because a deactivated one cannot sign in
+        var builder = Builders<WebUser>.Filter;
+        var filter = builder.Eq(u => u.Role, role) & builder.Eq(u => u.IsActive, true);
+
+        return await _users.CountDocumentsAsync(filter);
+    }
+
+    /// <summary>
     /// Counts all user documents, used to decide whether seeding is needed.
     /// </summary>
     public async Task<long> CountAsync()
@@ -158,14 +268,28 @@ public class WebUserRepository : IWebUserRepository
     }
 
     /// <summary>
-    /// Creates the unique index on the email field.
+    /// Creates the unique indexes on the email, username and NIC fields.
     /// </summary>
     public async Task EnsureIndexesAsync()
     {
-        // A unique index makes the database itself reject a duplicate email
-        var keys = Builders<WebUser>.IndexKeys.Ascending(u => u.Email);
-        var options = new CreateIndexOptions { Unique = true, Name = "ux_webUsers_email" };
+        // A unique index makes the database itself reject a duplicate value.
+        // Username and NIC are sparse as well, so that user documents created
+        // before those fields existed do not clash with one another.
+        var models = new[]
+        {
+            new CreateIndexModel<WebUser>(
+                Builders<WebUser>.IndexKeys.Ascending(u => u.Email),
+                new CreateIndexOptions { Unique = true, Name = "ux_webUsers_email" }),
 
-        await _users.Indexes.CreateOneAsync(new CreateIndexModel<WebUser>(keys, options));
+            new CreateIndexModel<WebUser>(
+                Builders<WebUser>.IndexKeys.Ascending(u => u.Username),
+                new CreateIndexOptions { Unique = true, Sparse = true, Name = "ux_webUsers_username" }),
+
+            new CreateIndexModel<WebUser>(
+                Builders<WebUser>.IndexKeys.Ascending(u => u.Nic),
+                new CreateIndexOptions { Unique = true, Sparse = true, Name = "ux_webUsers_nic" })
+        };
+
+        await _users.Indexes.CreateManyAsync(models);
     }
 }

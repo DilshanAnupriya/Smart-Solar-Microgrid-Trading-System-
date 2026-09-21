@@ -84,12 +84,14 @@ public class UserService : IUserService
         }
 
         var email = dto.Email.Trim().ToLowerInvariant();
+        var username = dto.Username.Trim().ToLowerInvariant();
+        var nic = dto.Nic.Trim().ToUpperInvariant();
 
-        // Business rule: an email address may only be used by one account
-        if (await _repository.EmailExistsAsync(email))
-        {
-            throw new ConflictException("An account with this email address already exists.");
-        }
+        // Business rule: the date of birth must be a real past date
+        var dateOfBirth = NormaliseDateOfBirth(dto.DateOfBirth);
+
+        // Business rule: email, username and NIC may each belong to one account
+        await EnsureIdentifiersAreFreeAsync(email, username, nic);
 
         var now = DateTime.UtcNow;
 
@@ -97,6 +99,10 @@ public class UserService : IUserService
         {
             FullName = dto.FullName.Trim(),
             Email = email,
+            Username = username,
+            Nic = nic,
+            Phone = dto.Phone.Trim(),
+            DateOfBirth = dateOfBirth,
 
             // The plain password is hashed immediately and never stored as typed
             PasswordHash = _passwordHasher.Hash(dto.Password),
@@ -127,15 +133,21 @@ public class UserService : IUserService
         }
 
         var email = dto.Email.Trim().ToLowerInvariant();
+        var username = dto.Username.Trim().ToLowerInvariant();
+        var nic = dto.Nic.Trim().ToUpperInvariant();
 
-        // Business rule: the new email must not belong to a different account
-        if (await _repository.EmailExistsAsync(email, excludeId: id))
-        {
-            throw new ConflictException("An account with this email address already exists.");
-        }
+        // Business rule: the date of birth must be a real past date
+        var dateOfBirth = NormaliseDateOfBirth(dto.DateOfBirth);
+
+        // Business rule: the new values must not belong to a different account
+        await EnsureIdentifiersAreFreeAsync(email, username, nic, excludeId: id);
 
         user.FullName = dto.FullName.Trim();
         user.Email = email;
+        user.Username = username;
+        user.Nic = nic;
+        user.Phone = dto.Phone.Trim();
+        user.DateOfBirth = dateOfBirth;
         user.Role = dto.Role;
         user.UpdatedAt = DateTime.UtcNow;
 
@@ -183,6 +195,93 @@ public class UserService : IUserService
         }
 
         await _repository.SetActiveAsync(id, true);
+    }
+
+    /// <summary>
+    /// Permanently deletes an account.
+    /// </summary>
+    public async Task DeleteAsync(string id, string currentUserId)
+    {
+        // Business rule: a signed in user may not delete their own account,
+        // for the same reason they may not deactivate it
+        if (string.Equals(id, currentUserId, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new BusinessRuleException("You cannot delete your own account.");
+        }
+
+        var user = await _repository.GetByIdAsync(id)
+                   ?? throw new NotFoundException("User not found.");
+
+        // Business rule: the last active Backoffice account must survive,
+        // otherwise nobody could administer the system afterwards
+        if (user.Role == UserRoles.Backoffice && user.IsActive)
+        {
+            var activeBackoffice = await _repository.CountActiveByRoleAsync(UserRoles.Backoffice);
+
+            if (activeBackoffice <= 1)
+            {
+                throw new BusinessRuleException(
+                    "This is the last active Backoffice account and cannot be deleted.");
+            }
+        }
+
+        await _repository.DeleteAsync(id);
+    }
+
+    /// <summary>
+    /// Checks that the email, username and NIC are not already taken by a
+    /// different account, and reports the first clash it finds.
+    /// </summary>
+    private async Task EnsureIdentifiersAreFreeAsync(
+        string email,
+        string username,
+        string nic,
+        string? excludeId = null)
+    {
+        // excludeId lets an account keep its own values while being edited
+        if (await _repository.EmailExistsAsync(email, excludeId))
+        {
+            throw new ConflictException("An account with this email address already exists.");
+        }
+
+        if (await _repository.UsernameExistsAsync(username, excludeId))
+        {
+            throw new ConflictException("An account with this username already exists.");
+        }
+
+        if (await _repository.NicExistsAsync(nic, excludeId))
+        {
+            throw new ConflictException("An account with this NIC number already exists.");
+        }
+    }
+
+    /// <summary>
+    /// Validates the date of birth and returns it as a UTC date.
+    /// </summary>
+    private static DateTime NormaliseDateOfBirth(DateTime? dateOfBirth)
+    {
+        // [Required] already rejected a missing value, so this is a safety net
+        if (!dateOfBirth.HasValue)
+        {
+            throw new BusinessRuleException("Date of birth is required.");
+        }
+
+        // Only the date part matters, and it is stored as UTC midnight
+        var value = DateTime.SpecifyKind(dateOfBirth.Value.Date, DateTimeKind.Utc);
+
+        // Business rule: a date of birth cannot be today or in the future
+        if (value >= DateTime.UtcNow.Date)
+        {
+            throw new BusinessRuleException("Date of birth must be in the past.");
+        }
+
+        // Business rule: reject an obviously impossible date
+        if (value < new DateTime(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc))
+        {
+            throw new BusinessRuleException("Date of birth must be on or after 1 January 1900.");
+        }
+
+        return value;
     }
 
     /// <summary>

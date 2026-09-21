@@ -14,13 +14,14 @@ using System.ComponentModel.DataAnnotations;
 namespace SmartSolar.Api.DTOs;
 
 /// <summary>
-/// Credentials posted to api/auth/login.
+/// Credentials posted to api/auth/login. The identifier may be the user's
+/// email address, their username or their phone number, so no single format
+/// can be enforced here; the lookup decides which one it matched.
 /// </summary>
 public class LoginRequestDto
 {
-    [Required(ErrorMessage = "Email is required.")]
-    [EmailAddress(ErrorMessage = "Email must be a valid email address.")]
-    public string Email { get; set; } = string.Empty;
+    [Required(ErrorMessage = "Email, username or phone number is required.")]
+    public string Identifier { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Password is required.")]
     public string Password { get; set; } = string.Empty;
