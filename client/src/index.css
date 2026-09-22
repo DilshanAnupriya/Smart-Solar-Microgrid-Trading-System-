@@ -1,0 +1,127 @@
+/*
+ * File:        index.css
+ * Project:     Smart Solar Microgrid Trading System (SE4040)
+ * Layer:       Styles
+ * Author:      N. Jayasinghe (IT2XXXXXXX)
+ * Created:     2026-09-20
+ * Description: A small set of overrides on top of Bootstrap 5. Bootstrap does
+ *              the layout, the grid and every component; these rules only add
+ *              the solar colour accent, the navigation bar and the sidebar.
+ */
+
+:root {
+  /* Solar accent used for the navigation bar and the brand mark */
+  --ss-navy: #10243e;
+  --ss-navy-soft: #1b3557;
+  --ss-solar: #f5a524;
+  --ss-surface: #f4f6fa;
+}
+
+body {
+  background-color: var(--ss-surface);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* ---------------------------------------------------------------- Shell -- */
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.app-navbar {
+  background-color: var(--ss-navy);
+  color: #fff;
+}
+
+.app-navbar .navbar-brand,
+.app-navbar .fw-semibold {
+  color: #fff;
+}
+
+.app-navbar .navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.app-navbar .navbar-toggler-icon {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.app-sidebar {
+  background-color: #fff;
+  min-height: calc(100vh - 56px);
+}
+
+.app-sidebar .nav-link {
+  color: #41506b;
+  font-size: 0.925rem;
+}
+
+.app-sidebar .nav-link:hover {
+  background-color: var(--ss-surface);
+  color: var(--ss-navy);
+}
+
+.app-sidebar .nav-link.active {
+  background-color: var(--ss-navy);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------------- Brand -- */
+
+.brand-mark {
+  align-items: center;
+  background-color: var(--ss-solar);
+  border-radius: 0.5rem;
+  color: var(--ss-navy);
+  display: inline-flex;
+  font-size: 1.05rem;
+  height: 2rem;
+  justify-content: center;
+  width: 2rem;
+}
+
+.brand-mark-lg {
+  font-size: 1.6rem;
+  height: 3rem;
+  width: 3rem;
+}
+
+.avatar-circle {
+  align-items: center;
+  background-color: var(--ss-solar);
+  border-radius: 50%;
+  color: var(--ss-navy);
+  display: inline-flex;
+  font-size: 0.8rem;
+  font-weight: 700;
+  height: 2.1rem;
+  justify-content: center;
+  width: 2.1rem;
+}
+
+/* ---------------------------------------------------------------- Login -- */
+
+.login-page {
+  background: linear-gradient(135deg, var(--ss-navy) 0%, var(--ss-navy-soft) 100%);
+}
+
+.login-card {
+  border-radius: 1rem;
+  max-width: 26rem;
+  width: 100%;
+}
+
+/* --------------------------------------------------------------- Tables -- */
+
+.table > thead th {
+  border-bottom-width: 1px;
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+}
+
+/* Keeps the confirmation dialog above Bootstrap's backdrop */
+.modal.show {
+  background-color: rgba(16, 36, 62, 0.35);
+  z-index: 1055;
+}
