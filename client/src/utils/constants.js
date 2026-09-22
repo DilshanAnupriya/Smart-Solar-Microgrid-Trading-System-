@@ -32,3 +32,16 @@ export const STORAGE_KEYS = {
   TOKEN: 'smartsolar.token',
   USER: 'smartsolar.user',
 };
+
+// Prosumer account status, spelled exactly as the API's ProsumerStatus enum
+// serialises it. The API rejects anything other than these two words.
+export const PROSUMER_STATUS = {
+  ACTIVE: 'Active',
+  DEACTIVATED: 'Deactivated',
+};
+
+// Used to build the status filter on the prosumer list page
+export const PROSUMER_STATUS_OPTIONS = [
+  { value: PROSUMER_STATUS.ACTIVE, label: 'Active' },
+  { value: PROSUMER_STATUS.DEACTIVATED, label: 'Deactivated' },
+];
