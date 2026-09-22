@@ -8,7 +8,10 @@
  *              the guards that enforce sign in and role based access. The
  *              /users routes are wrapped in RoleRoute so only Backoffice users
  *              reach them, matching the [Authorize(Roles = "Backoffice")]
- *              attribute on the Web API's UsersController.
+ *              attribute on the Web API's UsersController. The /prosumers
+ *              routes are open to both staff roles, matching the
+ *              [Authorize(Roles = "Backoffice,GridOperator")] attribute on
+ *              ProsumersController.
  */
 
 import { Route, Routes } from 'react-router-dom';
@@ -21,6 +24,9 @@ import LoginPage from './pages/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
 import OperationsHomePage from './pages/OperationsHomePage';
 import ProfilePage from './pages/ProfilePage';
+import ProsumerDetailPage from './pages/prosumers/ProsumerDetailPage';
+import ProsumerFormPage from './pages/prosumers/ProsumerFormPage';
+import ProsumerListPage from './pages/prosumers/ProsumerListPage';
 import UserFormPage from './pages/users/UserFormPage';
 import UsersListPage from './pages/users/UsersListPage';
 import { ROLES } from './utils/constants';
@@ -49,6 +55,16 @@ export default function App() {
             <Route path="users" element={<UsersListPage />} />
             <Route path="users/new" element={<UserFormPage />} />
             <Route path="users/:id/edit" element={<UserFormPage />} />
+          </Route>
+
+          {/* Prosumer management: both staff roles, matching
+              [Authorize(Roles = "Backoffice,GridOperator")] on the API. The
+              reactivate action inside the profile page is Backoffice only. */}
+          <Route element={<RoleRoute allowed={[ROLES.BACKOFFICE, ROLES.GRID_OPERATOR]} />}>
+            <Route path="prosumers" element={<ProsumerListPage />} />
+            <Route path="prosumers/new" element={<ProsumerFormPage />} />
+            <Route path="prosumers/:nic" element={<ProsumerDetailPage />} />
+            <Route path="prosumers/:nic/edit" element={<ProsumerFormPage />} />
           </Route>
 
           {/* Available to both roles */}

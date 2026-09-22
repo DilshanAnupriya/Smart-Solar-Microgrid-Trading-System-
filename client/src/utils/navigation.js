@@ -15,6 +15,7 @@ import { ROLES } from './constants';
 const ROUTE_RULES = [
   { prefix: '/users', roles: [ROLES.BACKOFFICE] },
   { prefix: '/operations', roles: [ROLES.GRID_OPERATOR] },
+  { prefix: '/prosumers', roles: [ROLES.BACKOFFICE, ROLES.GRID_OPERATOR] },
   { prefix: '/profile', roles: [ROLES.BACKOFFICE, ROLES.GRID_OPERATOR] },
 ];
 

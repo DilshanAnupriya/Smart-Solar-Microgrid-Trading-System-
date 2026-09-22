@@ -27,6 +27,7 @@ const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', icon: '■', end: true, roles: [ROLES.BACKOFFICE] },
   { to: '/operations', label: 'Operations', icon: '■', roles: [ROLES.GRID_OPERATOR] },
   { to: '/users', label: 'Users', icon: '●', roles: [ROLES.BACKOFFICE] },
+  { to: '/prosumers', label: 'Prosumers', icon: '◆', roles: [ROLES.BACKOFFICE, ROLES.GRID_OPERATOR] },
   { to: '/profile', label: 'My Profile', icon: '▲', roles: [ROLES.BACKOFFICE, ROLES.GRID_OPERATOR] },
 ];
 
