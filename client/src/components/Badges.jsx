@@ -35,3 +35,35 @@ export function StatusBadge({ isActive }) {
     </span>
   );
 }
+
+/**
+ * Shows reservation status with contextual color coding.
+ */
+export function ReservationStatusBadge({ status }) {
+  const config = {
+    Approved: 'text-bg-success',
+    Pending: 'text-bg-warning',
+    Completed: 'text-bg-info',
+    Cancelled: 'text-bg-secondary',
+  };
+
+  return (
+    <span className={`badge rounded-pill ${config[status] || 'text-bg-light border'}`}>
+      {status}
+    </span>
+  );
+}
+
+/**
+ * Shows whether the power trading transaction is DropOff (feed-in) or Charging (draw).
+ */
+export function ReservationTypeBadge({ type }) {
+  const isDropOff = type === 'DropOff';
+
+  return (
+    <span className={`badge ${isDropOff ? 'bg-success-subtle text-success border border-success' : 'bg-primary-subtle text-primary border border-primary'}`}>
+      {isDropOff ? '⚡ Drop-off' : '🔋 Charging'}
+    </span>
+  );
+}
+

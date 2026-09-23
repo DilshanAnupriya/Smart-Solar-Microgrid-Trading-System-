@@ -60,6 +60,10 @@ builder.Services.AddScoped<IWebUserRepository, WebUserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+// Data access and business logic for energy slot reservation management
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
+
 // Runs once at start-up to create indexes and seed the first Backoffice user
 builder.Services.AddScoped<DatabaseSeeder>();
 

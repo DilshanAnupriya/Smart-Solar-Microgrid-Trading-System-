@@ -26,6 +26,7 @@ import { initialsOf } from '../utils/formatters';
 const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', icon: '■', end: true, roles: [ROLES.BACKOFFICE] },
   { to: '/operations', label: 'Operations', icon: '■', roles: [ROLES.GRID_OPERATOR] },
+  { to: '/reservations', label: 'Reservations', icon: '⚡', roles: [ROLES.BACKOFFICE, ROLES.GRID_OPERATOR] },
   { to: '/users', label: 'Users', icon: '●', roles: [ROLES.BACKOFFICE] },
   { to: '/profile', label: 'My Profile', icon: '▲', roles: [ROLES.BACKOFFICE, ROLES.GRID_OPERATOR] },
 ];
