@@ -9,7 +9,7 @@
  *              so every status pill in the console looks the same.
  */
 
-import { PROSUMER_STATUS, ROLE_LABELS, ROLES } from '../utils/constants';
+import { NODE_STATUS, PROSUMER_STATUS, ROLE_LABELS, ROLES } from '../utils/constants';
 
 /**
  * Shows the user's role, with Backoffice highlighted as the administrative role.
@@ -47,6 +47,15 @@ export function ProsumerStatusBadge({ status }) {
   return (
     <span className={`badge rounded-pill ${isActive ? 'text-bg-success' : 'text-bg-secondary'}`}>
       {isActive ? 'Active' : 'Deactivated'}
+    </span>
+  );
+}
+
+/** Shows whether a microgrid node is available for operations and nearby search. */
+export function NodeStatusBadge({ isActive }) {
+  return (
+    <span className={`badge rounded-pill ${isActive ? 'text-bg-success' : 'text-bg-secondary'}`}>
+      {isActive ? NODE_STATUS.ACTIVE : NODE_STATUS.INACTIVE}
     </span>
   );
 }
