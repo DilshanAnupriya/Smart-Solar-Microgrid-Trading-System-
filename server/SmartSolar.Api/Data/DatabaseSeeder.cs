@@ -20,6 +20,7 @@ namespace SmartSolar.Api.Data;
 public class DatabaseSeeder
 {
     private readonly IWebUserRepository _repository;
+    private readonly INodeRepository _nodeRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly SeedAdminSettings _settings;
     private readonly ILogger<DatabaseSeeder> _logger;
@@ -29,12 +30,14 @@ public class DatabaseSeeder
     /// </summary>
     public DatabaseSeeder(
         IWebUserRepository repository,
+        INodeRepository nodeRepository,
         IPasswordHasher passwordHasher,
         IOptions<SeedAdminSettings> options,
         ILogger<DatabaseSeeder> logger)
     {
         // Store everything the seeding routine needs
         _repository = repository;
+        _nodeRepository = nodeRepository;
         _passwordHasher = passwordHasher;
         _settings = options.Value;
         _logger = logger;
@@ -47,6 +50,7 @@ public class DatabaseSeeder
     {
         // Indexes are created first so the seeded account is also protected by them
         await _repository.EnsureIndexesAsync();
+        await _nodeRepository.EnsureIndexesAsync();
 
         var existingUsers = await _repository.CountAsync();
 
