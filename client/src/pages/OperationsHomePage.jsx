@@ -11,6 +11,7 @@
  *              the team mates who own node management and slot booking.
  */
 
+import { Link } from 'react-router-dom';
 import PageHeader from '../components/PageHeader';
 import { useAuth } from '../auth/useAuth';
 
@@ -37,6 +38,7 @@ export default function OperationsHomePage() {
               <p className="text-secondary small mb-0">
                 Battery slot availability and node schedules appear here.
               </p>
+              <Link to="/nodes" className="btn btn-primary btn-sm mt-3">Manage node slots</Link>
             </div>
           </div>
         </div>

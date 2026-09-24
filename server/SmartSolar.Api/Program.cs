@@ -66,6 +66,11 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProsumerRepository, ProsumerRepository>();
 builder.Services.AddScoped<IProsumerService, ProsumerService>();
 
+// Microgrid node management: data access, reservation guard and business rules
+builder.Services.AddScoped<INodeRepository, NodeRepository>();
+builder.Services.AddScoped<INodeReservationChecker, NodeReservationChecker>();
+builder.Services.AddScoped<INodeService, NodeService>();
+
 // Runs once at start-up to create indexes and seed the first Backoffice user
 builder.Services.AddScoped<DatabaseSeeder>();
 

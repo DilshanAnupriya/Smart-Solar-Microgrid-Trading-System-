@@ -28,6 +28,7 @@ const NAV_ITEMS = [
   { to: '/operations', label: 'Operations', icon: '■', roles: [ROLES.GRID_OPERATOR] },
   { to: '/users', label: 'Users', icon: '●', roles: [ROLES.BACKOFFICE] },
   { to: '/prosumers', label: 'Prosumers', icon: '◆', roles: [ROLES.BACKOFFICE, ROLES.GRID_OPERATOR] },
+  { to: '/nodes', label: 'Microgrid Nodes', icon: '⬢', roles: [ROLES.BACKOFFICE, ROLES.GRID_OPERATOR] },
   { to: '/profile', label: 'My Profile', icon: '▲', roles: [ROLES.BACKOFFICE, ROLES.GRID_OPERATOR] },
 ];
 
