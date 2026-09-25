@@ -112,7 +112,12 @@ class ApiClient(context: Context) {
         fun parseSuccess(body: String): ApiResult<JSONObject> {
             // The whole object is returned; each *Api class picks out what it needs
             return try {
-                val json = if (body.isBlank()) JSONObject() else JSONObject(body)
+                val trimmed = body.trim()
+                val json = when {
+                    trimmed.isEmpty() -> JSONObject()
+                    trimmed.startsWith("[") -> JSONObject().put("data", org.json.JSONArray(trimmed))
+                    else -> JSONObject(trimmed)
+                }
                 ApiResult.Success(json, json.optText("message"))
             } catch (e: JSONException) {
                 ApiResult.Failure(ApiResult.UNREADABLE_MESSAGE, ApiResult.UNREADABLE_RESPONSE)

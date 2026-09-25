@@ -33,10 +33,20 @@ class AuthApi(context: Context) {
         return client.post("/auth/prosumer-login", body).map { parseLoginResponse(it) }
     }
 
+    /**
+     * Signs a Grid Operator (or Backoffice officer) in using email, username or phone.
+     * Hits POST /auth/login and stores role = GridOperator.
+     */
+    suspend fun operatorLogin(identifier: String, password: String): ApiResult<LocalUser> {
+        val body = JSONObject()
+            .put("identifier", identifier)
+            .put("password", password)
+        return client.post("/auth/login", body).map { parseOperatorLoginResponse(it) }
+    }
+
     companion object {
         /**
-         * Reads the login reply. Unlike most endpoints it is not wrapped in
-         * { success, message, data }: it is { token, expiresAt, role, user } at the top level.
+         * Reads the prosumer login reply.
          */
         fun parseLoginResponse(json: JSONObject): LocalUser {
             // For a prosumer the account id is the NIC
@@ -49,7 +59,28 @@ class AuthApi(context: Context) {
                 email = user.optText("email"),
                 phone = user.optText("phone"),
                 address = user.optText("address"),
-                role = json.optText("role").ifBlank { LocalUser.ROLE_PROSUMER },
+                role = json.optText("role").ifBlank { user.optText("role").ifBlank { LocalUser.ROLE_PROSUMER } },
+                token = json.getString("token"),
+                expiresAt = json.getString("expiresAt")
+            )
+        }
+
+        /**
+         * Reads the web user / Grid Operator login reply.
+         */
+        fun parseOperatorLoginResponse(json: JSONObject): LocalUser {
+            val user = json.getJSONObject("user")
+            val id = user.optText("id")
+            val nic = user.optText("nic")
+            val role = user.optText("role").ifBlank { LocalUser.ROLE_OPERATOR }
+            return LocalUser(
+                id = if (id.isNotBlank()) id else nic,
+                nic = nic,
+                fullName = user.optText("fullName"),
+                email = user.optText("email"),
+                phone = user.optText("phone"),
+                address = "",
+                role = role,
                 token = json.getString("token"),
                 expiresAt = json.getString("expiresAt")
             )

@@ -25,8 +25,15 @@ data class LocalUser(
     val token: String,
     val expiresAt: String
 ) {
+    val isOperator: Boolean
+        get() = role.equals(ROLE_OPERATOR, ignoreCase = true)
+
+    val isProsumer: Boolean
+        get() = role.equals(ROLE_PROSUMER, ignoreCase = true)
+
     companion object {
-        // Role the API writes into a prosumer's token and login reply
+        // Roles the API writes into user tokens and login replies
         const val ROLE_PROSUMER = "Prosumer"
+        const val ROLE_OPERATOR = "GridOperator"
     }
 }

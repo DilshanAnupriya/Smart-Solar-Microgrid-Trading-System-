@@ -180,4 +180,62 @@
     <string name="error_password_required">Password is required.</string>
     <string name="error_confirm_password_required">Please confirm your password.</string>
     <string name="error_passwords_do_not_match">Passwords do not match.</string>
+    <!-- Operator Mode strings -->
+    <string name="login_role_prosumer">Prosumer</string>
+    <string name="login_role_operator">Grid Operator</string>
+    <string name="login_operator_identifier_label">Email, username or phone</string>
+    <string name="login_operator_identifier_hint">operator@smartsolar.lk or operator</string>
+    <string name="operator_role_badge">GRID OPERATOR</string>
+
+    <!-- Operator Dashboard -->
+    <string name="operator_dashboard_title">Operator Console</string>
+    <string name="operator_dashboard_subtitle">Smart Solar Microgrid Dispatch Terminal</string>
+    <string name="operator_stat_pending">Pending</string>
+    <string name="operator_stat_approved">Approved</string>
+    <string name="operator_stat_completed">Completed</string>
+    <string name="operator_stat_total_kwh">Total Transferred</string>
+    <string name="operator_action_scan_qr">Scan Prosumer QR Code</string>
+    <string name="operator_action_scan_qr_desc">Scan transaction QR to verify booking and finalize transfer</string>
+    <string name="operator_action_reservations">Power Trading Bookings</string>
+    <string name="operator_action_reservations_desc">Monitor, search and filter all active and pending bookings</string>
+    <string name="operator_action_stations_map">Microgrid Stations Map</string>
+    <string name="operator_action_stations_map_desc">View nearby nodes, GPS positions and battery slot availability</string>
+    <string name="operator_recent_transfers_title">Recent Live Bookings</string>
+    <string name="operator_refresh">Refresh</string>
+
+    <!-- Operator QR Scanner -->
+    <string name="operator_scanner_title">Scan Prosumer QR</string>
+    <string name="operator_scanner_instruction">Position the prosumer\'s QR code within the scanner box</string>
+    <string name="operator_scanner_manual_entry">Enter Code Manually</string>
+    <string name="operator_scanner_gallery">Choose QR from Photos</string>
+    <string name="operator_scanner_demo_qr">Quick Test Demo QRs</string>
+    <string name="operator_scanner_verifying">Verifying against server…</string>
+    <string name="operator_scanner_hint">Enter reservation number (e.g. RES-20260922-A101) or token</string>
+    <string name="operator_scanner_verify_btn">Verify Reference</string>
+
+    <!-- Operator Verification & Finalization -->
+    <string name="operator_verify_title">Verify &amp; Finalize Transfer</string>
+    <string name="operator_verify_status_heading">Server Verification State</string>
+    <string name="operator_verify_prosumer_heading">Prosumer Profile</string>
+    <string name="operator_verify_energy_heading">Energy Transfer Specifications</string>
+    <string name="operator_verify_node_heading">Microgrid Station Details</string>
+    <string name="operator_verify_notes_label">Operator Transfer Notes (Optional)</string>
+    <string name="operator_verify_notes_hint">e.g. Inverter meter checked, transfer verified on site.</string>
+    <string name="operator_finalize_btn">Finalize Energy Transfer</string>
+    <string name="operator_finalizing">Finalizing transfer…</string>
+    <string name="operator_reject_btn">Reject / Cancel Transfer</string>
+
+    <!-- Job Complete Receipt -->
+    <string name="operator_complete_title">Transfer Finalized</string>
+    <string name="operator_complete_message">The energy transfer business logic has been successfully finalized and committed to the central API.</string>
+    <string name="operator_complete_scan_next">Scan Next Prosumer</string>
+    <string name="operator_complete_dashboard">Return to Dashboard</string>
+
+    <!-- Stations & Maps -->
+    <string name="operator_map_title">Microgrid Hub Stations</string>
+    <string name="operator_map_subtitle">Nearby Solar Microgrid Nodes</string>
+    <string name="operator_map_update_slots">Update Slots</string>
+    <string name="operator_map_navigate">Navigate (GPS)</string>
+    <string name="operator_map_available_slots">Available Battery Slots: %1$d / %2$d</string>
+    <string name="operator_map_capacity">Capacity: %1$.1f kW / %2$.1f kWh</string>
 </resources>

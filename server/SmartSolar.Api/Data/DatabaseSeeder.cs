@@ -56,57 +56,62 @@ public class DatabaseSeeder
         await _nodeRepository.EnsureIndexesAsync();
         await _reservationRepository.EnsureIndexesAsync();
 
+        await SeedNodesAsync();
         await SeedReservationsAsync();
 
         var existingUsers = await _repository.CountAsync();
-
-        // Only seed into a completely empty collection, so restarting the API
-        // never creates duplicate administrators
-        if (existingUsers > 0)
-        {
-            _logger.LogInformation("Seeding skipped: {Count} web user(s) already exist.", existingUsers);
-            return;
-        }
-
-        // Without a configured password there is nothing safe to insert
-        if (string.IsNullOrWhiteSpace(_settings.Email) || string.IsNullOrWhiteSpace(_settings.Password))
-        {
-            _logger.LogWarning(
-                "No web users exist and SeedAdmin is not configured. " +
-                "Set SeedAdmin:Email and SeedAdmin:Password to create the first Backoffice account.");
-            return;
-        }
-
         var now = DateTime.UtcNow;
 
-        var admin = new WebUser
+        // If the collection is empty, seed the initial Backoffice administrator
+        if (existingUsers == 0 && !string.IsNullOrWhiteSpace(_settings.Email) && !string.IsNullOrWhiteSpace(_settings.Password))
         {
-            FullName = string.IsNullOrWhiteSpace(_settings.FullName) ? "System Administrator" : _settings.FullName,
-            Email = _settings.Email.Trim().ToLowerInvariant(),
+            var admin = new WebUser
+            {
+                FullName = string.IsNullOrWhiteSpace(_settings.FullName) ? "System Administrator" : _settings.FullName,
+                Email = _settings.Email.Trim().ToLowerInvariant(),
+                Username = string.IsNullOrWhiteSpace(_settings.Username)
+                    ? "admin"
+                    : _settings.Username.Trim().ToLowerInvariant(),
+                Nic = string.IsNullOrWhiteSpace(_settings.Nic) ? "198012345678" : _settings.Nic.Trim().ToUpperInvariant(),
+                Phone = string.IsNullOrWhiteSpace(_settings.Phone) ? "0770000000" : _settings.Phone.Trim(),
+                DateOfBirth = _settings.DateOfBirth.HasValue
+                    ? DateTime.SpecifyKind(_settings.DateOfBirth.Value.Date, DateTimeKind.Utc)
+                    : null,
+                PasswordHash = _passwordHasher.Hash(_settings.Password),
+                Role = UserRoles.Backoffice,
+                IsActive = true,
+                CreatedAt = now,
+                UpdatedAt = now,
+                CreatedBy = "system"
+            };
 
-            // Fall back to sensible defaults so the seed never fails validation
-            Username = string.IsNullOrWhiteSpace(_settings.Username)
-                ? "admin"
-                : _settings.Username.Trim().ToLowerInvariant(),
-            Nic = _settings.Nic.Trim().ToUpperInvariant(),
-            Phone = _settings.Phone.Trim(),
-            DateOfBirth = _settings.DateOfBirth.HasValue
-                ? DateTime.SpecifyKind(_settings.DateOfBirth.Value.Date, DateTimeKind.Utc)
-                : null,
+            await _repository.CreateAsync(admin);
+            _logger.LogInformation("Seeded the first Backoffice account: {Email}", admin.Email);
+        }
 
-            PasswordHash = _passwordHasher.Hash(_settings.Password),
-            Role = UserRoles.Backoffice,
-            IsActive = true,
-            CreatedAt = now,
-            UpdatedAt = now,
+        // Seed a default Grid Operator account if one does not exist yet
+        var existingOperator = await _repository.GetByIdentifierAsync("operator@smartsolar.lk");
+        if (existingOperator is null)
+        {
+            var gridOperator = new WebUser
+            {
+                FullName = "Microgrid Site Operator",
+                Email = "operator@smartsolar.lk",
+                Username = "operator",
+                Nic = "199212345678",
+                Phone = "0771234567",
+                DateOfBirth = new DateTime(1992, 5, 15, 0, 0, 0, DateTimeKind.Utc),
+                PasswordHash = _passwordHasher.Hash("operator123"),
+                Role = UserRoles.GridOperator,
+                IsActive = true,
+                CreatedAt = now,
+                UpdatedAt = now,
+                CreatedBy = "system"
+            };
 
-            // Marked as created by the system because no signed in user made it
-            CreatedBy = "system"
-        };
-
-        await _repository.CreateAsync(admin);
-
-        _logger.LogInformation("Seeded the first Backoffice account: {Email}", admin.Email);
+            await _repository.CreateAsync(gridOperator);
+            _logger.LogInformation("Seeded default Grid Operator account: {Email}", gridOperator.Email);
+        }
     }
 
     /// <summary>
@@ -205,5 +210,77 @@ public class DatabaseSeeder
         }
 
         _logger.LogInformation("Seeded {Count} initial power trading reservations.", sampleReservations.Count);
+    }
+
+    /// <summary>
+    /// Seeds default microgrid solar hubs with GPS coordinates and battery slots if none exist.
+    /// </summary>
+    private async Task SeedNodesAsync()
+    {
+        var existingNodes = await _nodeRepository.GetActiveAsync();
+        if (existingNodes.Count > 0)
+        {
+            return;
+        }
+
+        var now = DateTime.UtcNow;
+        var sampleNodes = new List<MicrogridNode>
+        {
+            new()
+            {
+                NodeCode = "NODE-COLOMBO-01",
+                Name = "Colombo Central Hub (120 kWh)",
+                Address = "Galle Road, Colombo 03, Western Province",
+                Latitude = 6.9271,
+                Longitude = 79.8612,
+                GenerationCapacityKw = 50.0,
+                StorageCapacityKWh = 120.0,
+                TotalBatterySlots = 10,
+                AvailableBatterySlots = 7,
+                IsActive = true,
+                CreatedAt = now,
+                UpdatedAt = now,
+                CreatedBy = "system"
+            },
+            new()
+            {
+                NodeCode = "NODE-KANDY-02",
+                Name = "Kandy Hillcrest Station (80 kWh)",
+                Address = "Peradeniya Road, Kandy, Central Province",
+                Latitude = 7.2906,
+                Longitude = 80.6337,
+                GenerationCapacityKw = 35.0,
+                StorageCapacityKWh = 80.0,
+                TotalBatterySlots = 8,
+                AvailableBatterySlots = 5,
+                IsActive = true,
+                CreatedAt = now,
+                UpdatedAt = now,
+                CreatedBy = "system"
+            },
+            new()
+            {
+                NodeCode = "NODE-GALLE-01",
+                Name = "Galle Coastal Solar Grid (150 kWh)",
+                Address = "Matara Road, Galle, Southern Province",
+                Latitude = 6.0535,
+                Longitude = 80.2210,
+                GenerationCapacityKw = 60.0,
+                StorageCapacityKWh = 150.0,
+                TotalBatterySlots = 12,
+                AvailableBatterySlots = 9,
+                IsActive = true,
+                CreatedAt = now,
+                UpdatedAt = now,
+                CreatedBy = "system"
+            }
+        };
+
+        foreach (var node in sampleNodes)
+        {
+            await _nodeRepository.CreateAsync(node);
+        }
+
+        _logger.LogInformation("Seeded {Count} initial microgrid hub stations.", sampleNodes.Count);
     }
 }

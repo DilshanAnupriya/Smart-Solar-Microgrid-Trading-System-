@@ -7,6 +7,7 @@ espressoCore = "3.7.0"
 zxing = "3.5.4"
 coroutines = "1.10.2"
 orgJson = "20250517"
+playServicesMaps = "19.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -16,6 +17,7 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 org-json = { group = "org.json", name = "json", version.ref = "orgJson" }
+play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
