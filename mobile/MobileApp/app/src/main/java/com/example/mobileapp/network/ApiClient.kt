@@ -12,6 +12,7 @@
 package com.example.mobileapp.network
 
 import android.content.Context
+import android.util.Log
 import com.example.mobileapp.sessions.SessionManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -62,41 +63,57 @@ class ApiClient(context: Context) {
     private suspend fun send(method: String, path: String, body: JSONObject?): ApiResult<JSONObject> {
         // Everything below (network and the SQLite token read) runs off the main thread
         return withContext(Dispatchers.IO) {
-            var connection: HttpURLConnection? = null
-            try {
-                connection = URL(ApiConfig.BASE_URL + path).openConnection() as HttpURLConnection
-                connection.requestMethod = method
-                connection.connectTimeout = ApiConfig.CONNECT_TIMEOUT_MS
-                connection.readTimeout = ApiConfig.READ_TIMEOUT_MS
-                connection.setRequestProperty("Accept", "application/json")
-
-                // Sign-in and registration run before there is a token, so it is optional
-                sessionManager.getToken()?.let { token ->
-                    connection.setRequestProperty("Authorization", "Bearer $token")
-                }
-
-                // POST, PUT and PATCH always send a JSON body ("{}" when there is nothing to
-                // send), because Android's HTTP stack rejects those methods without one
-                if (method != "GET") {
-                    val bytes = (body ?: JSONObject()).toString().toByteArray(Charsets.UTF_8)
-                    connection.doOutput = true
-                    connection.setRequestProperty("Content-Type", "application/json; charset=utf-8")
-                    connection.setFixedLengthStreamingMode(bytes.size)
-                    connection.outputStream.use { it.write(bytes) }
-                }
-
-                // Error replies (4xx/5xx) are read from the error stream
-                val statusCode = connection.responseCode
-                val stream = if (statusCode in 200..299) connection.inputStream else connection.errorStream
-                val text = stream?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }.orEmpty()
-
-                if (statusCode in 200..299) parseSuccess(text) else parseFailure(statusCode, text)
-            } catch (e: IOException) {
-                // No network, the API is not running, cleartext blocked, or a timeout
-                ApiResult.Failure(NO_CONNECTION_MESSAGE, ApiResult.NO_RESPONSE)
-            } finally {
-                connection?.disconnect()
+            val candidateBases = if (ApiConfig.BASE_URL.isNotEmpty()) {
+                listOf(ApiConfig.BASE_URL) + ApiConfig.CANDIDATE_URLS.filter { it != ApiConfig.BASE_URL }
+            } else {
+                ApiConfig.CANDIDATE_URLS
             }
+
+            var lastException: IOException? = null
+
+            for (baseUrl in candidateBases) {
+                var connection: HttpURLConnection? = null
+                try {
+                    connection = URL(baseUrl + path).openConnection() as HttpURLConnection
+                    connection.requestMethod = method
+                    connection.connectTimeout = ApiConfig.CONNECT_TIMEOUT_MS
+                    connection.readTimeout = ApiConfig.READ_TIMEOUT_MS
+                    connection.setRequestProperty("Accept", "application/json")
+
+                    // Sign-in and registration run before there is a token, so it is optional
+                    sessionManager.getToken()?.let { token ->
+                        connection.setRequestProperty("Authorization", "Bearer $token")
+                    }
+
+                    // POST, PUT and PATCH always send a JSON body ("{}" when there is nothing to
+                    // send), because Android's HTTP stack rejects those methods without one
+                    if (method != "GET") {
+                        val bytes = (body ?: JSONObject()).toString().toByteArray(Charsets.UTF_8)
+                        connection.doOutput = true
+                        connection.setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                        connection.setFixedLengthStreamingMode(bytes.size)
+                        connection.outputStream.use { it.write(bytes) }
+                    }
+
+                    // Error replies (4xx/5xx) are read from the error stream
+                    val statusCode = connection.responseCode
+                    val stream = if (statusCode in 200..299) connection.inputStream else connection.errorStream
+                    val text = stream?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }.orEmpty()
+
+                    // Succeeded in reaching the server, remember this URL as active BASE_URL
+                    ApiConfig.BASE_URL = baseUrl
+
+                    return@withContext if (statusCode in 200..299) parseSuccess(text) else parseFailure(statusCode, text)
+                } catch (e: IOException) {
+                    Log.w("ApiClient", "Network request failed on $baseUrl$path: ${e.message}")
+                    lastException = e
+                } finally {
+                    connection?.disconnect()
+                }
+            }
+
+            Log.e("ApiClient", "All candidate URLs failed for $method $path", lastException)
+            ApiResult.Failure(NO_CONNECTION_MESSAGE, ApiResult.NO_RESPONSE)
         }
     }
 

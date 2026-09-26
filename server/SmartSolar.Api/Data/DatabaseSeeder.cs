@@ -101,7 +101,7 @@ public class DatabaseSeeder
                 Nic = "199212345678",
                 Phone = "0771234567",
                 DateOfBirth = new DateTime(1992, 5, 15, 0, 0, 0, DateTimeKind.Utc),
-                PasswordHash = _passwordHasher.Hash("operator123"),
+                PasswordHash = _passwordHasher.Hash("Operator@123"),
                 Role = UserRoles.GridOperator,
                 IsActive = true,
                 CreatedAt = now,
