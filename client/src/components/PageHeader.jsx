@@ -10,14 +10,14 @@
 
 export default function PageHeader({ title, subtitle, actions }) {
   return (
-    <div className="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+    <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
       <div>
-        <h1 className="h3 fw-semibold mb-1">{title}</h1>
+        <h1 className="page-title mb-1">{title}</h1>
         {subtitle && <p className="text-secondary mb-0">{subtitle}</p>}
       </div>
 
       {/* Buttons such as "Add User" are passed in by the page */}
-      {actions && <div className="d-flex gap-2">{actions}</div>}
+      {actions && <div className="d-flex flex-wrap gap-2">{actions}</div>}
     </div>
   );
 }

@@ -9,7 +9,6 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
 
 class LoginActivity : Activity() {
 
@@ -77,7 +76,8 @@ class LoginActivity : Activity() {
         }
         if (!isValid) return
 
-        // UI only for now: the call to the auth API goes here once the prosumer login endpoint exists
-        Toast.makeText(this, R.string.login_not_connected, Toast.LENGTH_SHORT).show()
+        // UI only for now: the call to the auth API goes here once the prosumer login endpoint exists.
+        // Until then, go straight to the profile screen, which shows sample data.
+        startActivity(Intent(this, ProfileActivity::class.java))
     }
 }

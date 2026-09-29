@@ -14,7 +14,6 @@
     <string name="login_logo_description">Smart Solar Microgrid logo</string>
     <string name="login_error_identifier_required">Enter your email, username or phone number</string>
     <string name="login_error_password_required">Enter your password</string>
-    <string name="login_not_connected">Sign-in is not connected to the server yet</string>
     <string name="login_no_account">Don\'t have an account?</string>
     <string name="login_go_to_register">Register</string>
 
@@ -42,6 +41,125 @@
     <string name="register_have_account">Already have an account?</string>
     <string name="register_go_to_login">Sign in</string>
     <string name="register_not_connected">Registration is not connected to the server yet</string>
+
+    <!-- Profile screen -->
+    <string name="profile_title">My profile</string>
+    <string name="profile_edit">Edit</string>
+    <string name="profile_deactivate">Deactivate</string>
+    <string name="profile_nic_subtitle">NIC %1$s</string>
+    <string name="profile_status_active">Active</string>
+    <string name="profile_status_deactivated">Deactivated</string>
+    <string name="profile_deactivated_banner">Your account is deactivated. You can\'t sign in or trade energy until a Backoffice officer reactivates it.</string>
+    <string name="profile_details_heading">Personal details</string>
+    <string name="profile_nic_label">NIC number</string>
+    <string name="profile_nic_locked">Your account ID. It can\'t be changed.</string>
+    <string name="profile_email_label">Email</string>
+    <string name="profile_phone_label">Phone number</string>
+    <string name="profile_address_label">Address</string>
+    <string name="profile_member_since_label">Member since</string>
+    <string name="profile_updated">Profile updated (not saved to the server yet)</string>
+
+    <!-- Deactivate confirmation -->
+    <string name="deactivate_title">Deactivate your account?</string>
+    <string name="deactivate_message">You won\'t be able to sign in or trade energy after this. Only a Backoffice officer can reactivate your account.</string>
+    <string name="deactivate_confirm">Deactivate</string>
+    <string name="deactivate_cancel">Cancel</string>
+    <string name="deactivate_not_connected">Deactivation is not connected to the server yet</string>
+
+    <!-- Edit profile screen -->
+    <string name="edit_profile_title">Edit profile</string>
+    <string name="edit_profile_back">Back to profile</string>
+    <string name="edit_profile_nic_helper">Your NIC is your account ID and can\'t be changed.</string>
+    <string name="edit_profile_save">Save changes</string>
+    <string name="edit_profile_cancel">Cancel</string>
+
+    <!-- Profile: link to reservations -->
+    <string name="profile_reservations_title">Energy reservations</string>
+    <string name="profile_reservations_subtitle">Reserve, modify or cancel drop-off and charging slots</string>
+
+    <!-- Reservation values -->
+    <string name="reservation_type_drop_off">Drop-off</string>
+    <string name="reservation_type_charging">Charging</string>
+    <string name="reservation_type_drop_off_help">Send your surplus solar energy to the node\'s battery storage.</string>
+    <string name="reservation_type_charging_help">Draw stored energy from the node to charge your battery.</string>
+    <string name="reservation_status_pending">Pending</string>
+    <string name="reservation_status_approved">Approved</string>
+    <string name="reservation_status_cancelled">Cancelled</string>
+    <string name="reservation_status_completed">Completed</string>
+    <string name="reservation_time_range">%1$s – %2$s</string>
+    <string name="reservation_energy">%1$s kWh</string>
+    <string name="reservation_type_and_energy">%1$s · %2$s</string>
+    <string name="reservation_date_and_time">%1$s · %2$s</string>
+    <plurals name="reservation_duration">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+
+    <!-- My reservations -->
+    <string name="reservations_title">My reservations</string>
+    <string name="reservations_back">Back</string>
+    <string name="reservations_new">New</string>
+    <string name="reservations_upcoming">Upcoming</string>
+    <string name="reservations_past">Past and cancelled</string>
+    <string name="reservations_empty">You have no reservations yet. Tap New to reserve an energy slot.</string>
+
+    <!-- New / modify reservation form -->
+    <string name="reservation_form_new_title">New reservation</string>
+    <string name="reservation_form_modify_title">Modify reservation</string>
+    <string name="reservation_form_modify_note">Reservation %1$s. Your changes need a grid operator\'s approval again, and the current QR code will stop working.</string>
+    <string name="reservation_node_label">Grid node</string>
+    <string name="reservation_node_hint">Choose a grid node</string>
+    <string name="reservation_type_label">Reservation type</string>
+    <string name="reservation_date_label">Date</string>
+    <string name="reservation_date_hint">Choose a date</string>
+    <string name="reservation_time_label">Start time</string>
+    <string name="reservation_time_hint">Select</string>
+    <string name="reservation_window_helper">Reservations must start within the next 7 days.</string>
+    <string name="reservation_duration_label">Duration</string>
+    <string name="reservation_energy_label">Energy amount (kWh)</string>
+    <string name="reservation_energy_hint">e.g. 10</string>
+    <string name="reservation_energy_helper">Between 1 and 100 kWh.</string>
+    <string name="reservation_submit_new">Request reservation</string>
+    <string name="reservation_submit_modify">Save changes</string>
+
+    <!-- Reservation detail -->
+    <string name="reservation_detail_title">Reservation</string>
+    <string name="reservation_modify">Modify</string>
+    <string name="reservation_cancel">Cancel</string>
+    <string name="reservation_locked_banner">This reservation starts in less than 12 hours, so it can no longer be modified or cancelled in the app. Please contact a grid operator.</string>
+    <string name="reservation_pending_banner">Waiting for approval. A grid operator will review this reservation, and your transaction QR code will appear here once it\'s approved.</string>
+    <string name="reservation_qr_title">Transaction QR code</string>
+    <string name="reservation_qr_hint">Show this code to the grid operator at the node to start the energy transfer.</string>
+    <string name="reservation_qr_description">Transaction QR code for reservation %1$s</string>
+    <string name="reservation_detail_node">Grid node</string>
+    <string name="reservation_detail_type">Type</string>
+    <string name="reservation_detail_date">Date</string>
+    <string name="reservation_detail_time">Time</string>
+    <string name="reservation_detail_duration">Duration</string>
+    <string name="reservation_detail_energy">Energy</string>
+    <string name="reservation_cancel_title">Cancel this reservation?</string>
+    <string name="reservation_cancel_message">Your slot at %1$s on %2$s will be released. This can\'t be undone.</string>
+    <string name="reservation_cancel_confirm">Cancel reservation</string>
+    <string name="reservation_cancel_keep">Keep it</string>
+    <string name="reservation_change_locked">This reservation starts in less than 12 hours, so it can no longer be changed.</string>
+
+    <!-- Summary page after create / modify / cancel -->
+    <string name="summary_created_title">Reservation requested</string>
+    <string name="summary_created_message">Your request has been sent. A grid operator will review it, and your QR code will appear once it\'s approved.</string>
+    <string name="summary_updated_title">Reservation updated</string>
+    <string name="summary_updated_message">Your changes have been sent for approval. The previous QR code no longer works.</string>
+    <string name="summary_cancelled_title">Reservation cancelled</string>
+    <string name="summary_cancelled_message">Your reservation has been cancelled and the slot is free for other prosumers.</string>
+    <string name="summary_view_reservation">View reservation</string>
+    <string name="summary_back_to_list">Back to my reservations</string>
+
+    <!-- Reservation form errors -->
+    <string name="error_node_required">Choose a grid node.</string>
+    <string name="error_start_required">Choose a date and a start time.</string>
+    <string name="error_start_in_past">That start time has already passed.</string>
+    <string name="error_start_too_far">Reservations must start within the next 7 days.</string>
+    <string name="error_energy_required">Enter the energy amount.</string>
+    <string name="error_energy_range">Enter an amount between 1 and 100 kWh.</string>
 
     <!-- Prosumer form errors (same wording as the web client) -->
     <string name="error_nic_required">NIC number is required.</string>

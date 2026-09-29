@@ -10,12 +10,13 @@
  */
 
 import { useState } from 'react';
+import Icon from '../components/Icon';
 import PageHeader from '../components/PageHeader';
 import { RoleBadge, StatusBadge } from '../components/Badges';
 import { useAuth } from '../auth/useAuth';
 import { useToast } from '../toast/useToast';
 import { changePassword } from '../api/authApi';
-import { formatDate, formatDateTime } from '../utils/formatters';
+import { formatDate, formatDateTime, initialsOf } from '../utils/formatters';
 import { validateChangePasswordForm } from '../utils/validators';
 
 const EMPTY_FORM = { currentPassword: '', newPassword: '', confirmPassword: '' };
@@ -64,52 +65,73 @@ export default function ProfilePage() {
     }
   }
 
+  // Read-only account details, shown as icon + label + value rows
+  const details = [
+    { icon: 'user', label: 'Full name', value: user?.fullName },
+    { icon: 'mail', label: 'Email', value: user?.email },
+    { icon: 'at', label: 'Username', value: user?.username || '—' },
+    { icon: 'idCard', label: 'NIC number', value: user?.nic || '—' },
+    { icon: 'phone', label: 'Phone', value: user?.phone || '—' },
+    { icon: 'calendar', label: 'Date of birth', value: formatDate(user?.dateOfBirth) },
+    { icon: 'clock', label: 'Account created', value: formatDateTime(user?.createdAt) },
+  ];
+
   return (
     <>
       <PageHeader title="My profile" subtitle="Your account details and password" />
 
+      {/* Summary card: who is signed in, their role and account status */}
+      <div className="card mb-3">
+        <div className="card-body profile-hero">
+          <span className="avatar-circle avatar-circle-lg" aria-hidden="true">
+            {initialsOf(user?.fullName)}
+          </span>
+          <div className="min-w-0">
+            <h2 className="h4 fw-bold mb-1 text-truncate">{user?.fullName}</h2>
+            <p className="text-secondary mb-2 text-truncate">{user?.email}</p>
+            <div className="d-flex flex-wrap gap-2">
+              <RoleBadge role={user?.role} />
+              <StatusBadge isActive={user?.isActive} />
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="row g-3">
         <div className="col-lg-5">
-          <div className="card border-0 shadow-sm h-100">
+          <div className="card h-100">
             <div className="card-body">
-              <h2 className="h6 fw-semibold mb-3">Account details</h2>
+              <h2 className="card-title-sm mb-3">Account details</h2>
 
-              <dl className="row mb-0 small">
-                <dt className="col-5 text-secondary fw-normal">Full name</dt>
-                <dd className="col-7">{user?.fullName}</dd>
-
-                <dt className="col-5 text-secondary fw-normal">Email</dt>
-                <dd className="col-7">{user?.email}</dd>
-
-                <dt className="col-5 text-secondary fw-normal">Username</dt>
-                <dd className="col-7">{user?.username || '—'}</dd>
-
-                <dt className="col-5 text-secondary fw-normal">NIC number</dt>
-                <dd className="col-7">{user?.nic || '—'}</dd>
-
-                <dt className="col-5 text-secondary fw-normal">Phone</dt>
-                <dd className="col-7">{user?.phone || '—'}</dd>
-
-                <dt className="col-5 text-secondary fw-normal">Date of birth</dt>
-                <dd className="col-7">{formatDate(user?.dateOfBirth)}</dd>
-
-                <dt className="col-5 text-secondary fw-normal">Role</dt>
-                <dd className="col-7"><RoleBadge role={user?.role} /></dd>
-
-                <dt className="col-5 text-secondary fw-normal">Status</dt>
-                <dd className="col-7"><StatusBadge isActive={user?.isActive} /></dd>
-
-                <dt className="col-5 text-secondary fw-normal">Created</dt>
-                <dd className="col-7">{formatDateTime(user?.createdAt)}</dd>
+              <dl className="detail-list">
+                {details.map((item) => (
+                  <div className="detail-row" key={item.label}>
+                    <Icon name={item.icon} size={18} />
+                    <div className="min-w-0">
+                      <dt>{item.label}</dt>
+                      <dd>{item.value}</dd>
+                    </div>
+                  </div>
+                ))}
               </dl>
             </div>
           </div>
         </div>
 
         <div className="col-lg-7">
-          <div className="card border-0 shadow-sm h-100">
+          <div className="card h-100">
             <div className="card-body">
-              <h2 className="h6 fw-semibold mb-3">Change password</h2>
+              <div className="d-flex align-items-start gap-3 mb-4">
+                <span className="stat-icon bg-warning-subtle text-warning-emphasis">
+                  <Icon name="key" size={20} />
+                </span>
+                <div>
+                  <h2 className="card-title-sm mb-1">Change password</h2>
+                  <p className="text-secondary small mb-0">
+                    Use at least 6 characters, and choose something different from your current password.
+                  </p>
+                </div>
+              </div>
 
               <form onSubmit={handleSubmit} noValidate>
                 <div className="mb-3">
@@ -129,41 +151,43 @@ export default function ProfilePage() {
                   )}
                 </div>
 
-                <div className="mb-3">
-                  <label htmlFor="newPassword" className="form-label">New password</label>
-                  <input
-                    id="newPassword"
-                    name="newPassword"
-                    type="password"
-                    autoComplete="new-password"
-                    className={`form-control ${fieldErrors.newPassword ? 'is-invalid' : ''}`}
-                    value={values.newPassword}
-                    onChange={handleChange}
-                    disabled={submitting}
-                  />
-                  {fieldErrors.newPassword && (
-                    <div className="invalid-feedback">{fieldErrors.newPassword}</div>
-                  )}
+                <div className="row g-3 mb-4">
+                  <div className="col-md-6">
+                    <label htmlFor="newPassword" className="form-label">New password</label>
+                    <input
+                      id="newPassword"
+                      name="newPassword"
+                      type="password"
+                      autoComplete="new-password"
+                      className={`form-control ${fieldErrors.newPassword ? 'is-invalid' : ''}`}
+                      value={values.newPassword}
+                      onChange={handleChange}
+                      disabled={submitting}
+                    />
+                    {fieldErrors.newPassword && (
+                      <div className="invalid-feedback">{fieldErrors.newPassword}</div>
+                    )}
+                  </div>
+
+                  <div className="col-md-6">
+                    <label htmlFor="confirmPassword" className="form-label">Confirm new password</label>
+                    <input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type="password"
+                      autoComplete="new-password"
+                      className={`form-control ${fieldErrors.confirmPassword ? 'is-invalid' : ''}`}
+                      value={values.confirmPassword}
+                      onChange={handleChange}
+                      disabled={submitting}
+                    />
+                    {fieldErrors.confirmPassword && (
+                      <div className="invalid-feedback">{fieldErrors.confirmPassword}</div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="mb-4">
-                  <label htmlFor="confirmPassword" className="form-label">Confirm new password</label>
-                  <input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    autoComplete="new-password"
-                    className={`form-control ${fieldErrors.confirmPassword ? 'is-invalid' : ''}`}
-                    value={values.confirmPassword}
-                    onChange={handleChange}
-                    disabled={submitting}
-                  />
-                  {fieldErrors.confirmPassword && (
-                    <div className="invalid-feedback">{fieldErrors.confirmPassword}</div>
-                  )}
-                </div>
-
-                <button type="submit" className="btn btn-primary" disabled={submitting}>
+                <button type="submit" className="btn btn-primary px-4" disabled={submitting}>
                   {submitting && <span className="spinner-border spinner-border-sm me-2" aria-hidden="true" />}
                   Change password
                 </button>

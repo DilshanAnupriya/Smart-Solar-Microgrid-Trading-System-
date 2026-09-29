@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Prosumer profile: a fixed top bar with Edit and Deactivate on the right,
+     and a scrolling page of cards underneath -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <!-- Top bar -->
+    <LinearLayout
+        style="@style/TopBar"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <TextView
+            style="@style/TopBarTitle"
+            android:text="@string/profile_title" />
+
+        <Button
+            android:id="@+id/btnEdit"
+            style="@style/SmallButton.PrimaryOutline"
+            android:text="@string/profile_edit" />
+
+        <Button
+            android:id="@+id/btnDeactivate"
+            style="@style/SmallButton.DangerOutline"
+            android:layout_marginStart="8dp"
+            android:text="@string/profile_deactivate" />
+    </LinearLayout>
+
+    <View style="@style/Divider" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/page_background"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Shown only when the account is deactivated -->
+            <TextView
+                android:id="@+id/tvDeactivatedBanner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/bg_banner_danger"
+                android:padding="16dp"
+                android:text="@string/profile_deactivated_banner"
+                android:textColor="@color/danger_text"
+                android:textSize="15sp"
+                android:visibility="gone" />
+
+            <!-- Header card: avatar, name, NIC and status -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/tvAvatar"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:background="@drawable/bg_avatar"
+                    android:gravity="center"
+                    android:importantForAccessibility="no"
+                    android:textColor="@color/text_dark"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_dark"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvNicSubtitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:textColor="@color/text_muted"
+                        android:textSize="14sp" />
+
+                    <!-- Background and colours are set in code from the status -->
+                    <TextView
+                        android:id="@+id/tvStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="3dp"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Link to the prosumer's energy reservations (hidden when deactivated) -->
+            <LinearLayout
+                android:id="@+id/cardReservations"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_card"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/profile_reservations_title"
+                        android:textColor="@color/text_dark"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/profile_reservations_subtitle"
+                        android:textColor="@color/text_muted"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="8dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_chevron_right" />
+            </LinearLayout>
+
+            <!-- Details card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_card"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="4dp"
+                    android:text="@string/profile_details_heading"
+                    android:textColor="@color/text_dark"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <!-- NIC: the primary key, so it is shown with a note that it is fixed -->
+                <LinearLayout style="@style/ProfileRow">
+
+                    <TextView
+                        style="@style/ProfileLabel"
+                        android:text="@string/profile_nic_label" />
+
+                    <TextView
+                        android:id="@+id/tvNic"
+                        style="@style/ProfileValue" />
+
+                    <TextView
+                        style="@style/FormHelper"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/profile_nic_locked" />
+                </LinearLayout>
+
+                <View style="@style/Divider" />
+
+                <LinearLayout style="@style/ProfileRow">
+
+                    <TextView
+                        style="@style/ProfileLabel"
+                        android:text="@string/profile_email_label" />
+
+                    <TextView
+                        android:id="@+id/tvEmail"
+                        style="@style/ProfileValue" />
+                </LinearLayout>
+
+                <View style="@style/Divider" />
+
+                <LinearLayout style="@style/ProfileRow">
+
+                    <TextView
+                        style="@style/ProfileLabel"
+                        android:text="@string/profile_phone_label" />
+
+                    <TextView
+                        android:id="@+id/tvPhone"
+                        style="@style/ProfileValue" />
+                </LinearLayout>
+
+                <View style="@style/Divider" />
+
+                <LinearLayout style="@style/ProfileRow">
+
+                    <TextView
+                        style="@style/ProfileLabel"
+                        android:text="@string/profile_address_label" />
+
+                    <TextView
+                        android:id="@+id/tvAddress"
+                        style="@style/ProfileValue" />
+                </LinearLayout>
+
+                <View style="@style/Divider" />
+
+                <LinearLayout style="@style/ProfileRow">
+
+                    <TextView
+                        style="@style/ProfileLabel"
+                        android:text="@string/profile_member_since_label" />
+
+                    <TextView
+                        android:id="@+id/tvMemberSince"
+                        style="@style/ProfileValue" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

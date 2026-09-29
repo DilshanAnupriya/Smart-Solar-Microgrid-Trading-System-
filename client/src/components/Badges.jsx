@@ -19,7 +19,13 @@ export function RoleBadge({ role }) {
   const isBackoffice = role === ROLES.BACKOFFICE;
 
   return (
-    <span className={`badge rounded-pill ${isBackoffice ? 'text-bg-primary' : 'text-bg-info'}`}>
+    <span
+      className={`badge rounded-pill border ${
+        isBackoffice
+          ? 'bg-primary-subtle text-primary-emphasis border-primary-subtle'
+          : 'bg-info-subtle text-info-emphasis border-info-subtle'
+      }`}
+    >
       {ROLE_LABELS[role] || role}
     </span>
   );
@@ -30,11 +36,7 @@ export function RoleBadge({ role }) {
  */
 export function StatusBadge({ isActive }) {
   // Deactivated accounts stay in the database but cannot sign in
-  return (
-    <span className={`badge rounded-pill ${isActive ? 'text-bg-success' : 'text-bg-secondary'}`}>
-      {isActive ? 'Active' : 'Deactivated'}
-    </span>
-  );
+  return <StatusPill isActive={isActive} />;
 }
 
 /**
@@ -44,8 +46,23 @@ export function ProsumerStatusBadge({ status }) {
   // The API sends the status as the text "Active" or "Deactivated"
   const isActive = status === PROSUMER_STATUS.ACTIVE;
 
+  return <StatusPill isActive={isActive} />;
+}
+
+/**
+ * Green "Active" or grey "Deactivated" pill with a coloured dot, shared by the
+ * web user and prosumer badges so both look identical.
+ */
+function StatusPill({ isActive }) {
+  // The dot comes from the .status-badge rule in index.css
   return (
-    <span className={`badge rounded-pill ${isActive ? 'text-bg-success' : 'text-bg-secondary'}`}>
+    <span
+      className={`badge rounded-pill border status-badge ${
+        isActive
+          ? 'bg-success-subtle text-success-emphasis border-success-subtle'
+          : 'bg-secondary-subtle text-secondary-emphasis border-secondary-subtle'
+      }`}
+    >
       {isActive ? 'Active' : 'Deactivated'}
     </span>
   );

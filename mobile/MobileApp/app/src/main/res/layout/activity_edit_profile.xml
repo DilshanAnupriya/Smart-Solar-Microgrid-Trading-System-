@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Edit profile: top bar with a back arrow, then the editable fields.
+     The root takes the system-bar and keyboard insets as padding, so the ScrollView shrinks
+     when the keyboard opens and scrolls the focused field into view (same as the register screen). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <!-- Top bar -->
+    <LinearLayout style="@style/TopBar">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/edit_profile_back"
+            android:src="@drawable/ic_arrow_back" />
+
+        <TextView
+            style="@style/TopBarTitle"
+            android:layout_marginStart="4dp"
+            android:text="@string/edit_profile_title" />
+    </LinearLayout>
+
+    <View style="@style/Divider" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:paddingBottom="24dp">
+
+            <!-- NIC: shown for reference only; it is the primary key and can't be edited -->
+            <TextView
+                style="@style/FormLabel"
+                android:layout_marginTop="8dp"
+                android:text="@string/register_nic_label" />
+
+            <TextView
+                android:id="@+id/tvNic"
+                style="@style/FormInput"
+                android:background="@drawable/bg_input_disabled"
+                android:gravity="center_vertical"
+                android:textColor="@color/text_muted" />
+
+            <TextView
+                style="@style/FormHelper"
+                android:text="@string/edit_profile_nic_helper" />
+
+            <!-- Full name -->
+            <TextView
+                style="@style/FormLabel"
+                android:text="@string/register_full_name_label" />
+
+            <EditText
+                android:id="@+id/etFullName"
+                style="@style/FormInput"
+                android:autofillHints="name"
+                android:hint="@string/register_full_name_hint"
+                android:inputType="textPersonName|textCapWords"
+                android:maxLength="100" />
+
+            <!-- Email -->
+            <TextView
+                style="@style/FormLabel"
+                android:text="@string/register_email_label" />
+
+            <EditText
+                android:id="@+id/etEmail"
+                style="@style/FormInput"
+                android:autofillHints="emailAddress"
+                android:hint="@string/register_email_hint"
+                android:inputType="textEmailAddress" />
+
+            <!-- Phone -->
+            <TextView
+                style="@style/FormLabel"
+                android:text="@string/register_phone_label" />
+
+            <EditText
+                android:id="@+id/etPhone"
+                style="@style/FormInput"
+                android:autofillHints="phone"
+                android:hint="@string/register_phone_hint"
+                android:inputType="phone"
+                android:maxLength="10" />
+
+            <!-- Address: multi-line, so it grows instead of using the fixed 48dp input height -->
+            <TextView
+                style="@style/FormLabel"
+                android:text="@string/register_address_label" />
+
+            <EditText
+                android:id="@+id/etAddress"
+                style="@style/FormInput"
+                android:layout_height="wrap_content"
+                android:autofillHints="postalAddress"
+                android:gravity="top|start"
+                android:hint="@string/register_address_hint"
+                android:inputType="textPostalAddress|textMultiLine|textCapWords"
+                android:maxLength="250"
+                android:minLines="3"
+                android:paddingVertical="12dp" />
+
+            <Button
+                android:id="@+id/btnSave"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="28dp"
+                android:background="@drawable/bg_btn_primary"
+                android:stateListAnimator="@null"
+                android:text="@string/edit_profile_save"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="17sp" />
+
+            <Button
+                android:id="@+id/btnCancel"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_btn_secondary_outline"
+                android:stateListAnimator="@null"
+                android:text="@string/edit_profile_cancel"
+                android:textAllCaps="false"
+                android:textColor="@color/btn_outline_text"
+                android:textSize="17sp" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

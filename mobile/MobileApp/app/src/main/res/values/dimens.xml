@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The QR bitmap is drawn at the size it is shown, so it stays sharp -->
+    <dimen name="qr_code_size">220dp</dimen>
+</resources>
