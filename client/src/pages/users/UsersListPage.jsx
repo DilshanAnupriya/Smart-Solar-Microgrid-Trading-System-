@@ -14,6 +14,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ConfirmModal from '../../components/ConfirmModal';
 import EmptyState from '../../components/EmptyState';
+import Icon from '../../components/Icon';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import PageHeader from '../../components/PageHeader';
 import UserDetailsModal from '../../components/UserDetailsModal';
@@ -22,7 +23,7 @@ import { useAuth } from '../../auth/useAuth';
 import { useToast } from '../../toast/useToast';
 import { activateUser, deactivateUser, deleteUser, getUsers } from '../../api/usersApi';
 import { ROLE_OPTIONS } from '../../utils/constants';
-import { formatDate } from '../../utils/formatters';
+import { formatDate, initialsOf } from '../../utils/formatters';
 
 // Wording of the confirmation dialog for each action the table can start
 const ACTION_TEXT = {
@@ -129,7 +130,8 @@ export default function UsersListPage() {
         title="User management"
         subtitle="Create and manage Backoffice and Grid Operator accounts"
         actions={
-          <Link to="/users/new" className="btn btn-primary">
+          <Link to="/users/new" className="btn btn-primary d-flex align-items-center gap-2">
+            <Icon name="plus" size={16} strokeWidth={2.2} />
             Add user
           </Link>
         }
@@ -140,14 +142,17 @@ export default function UsersListPage() {
           <div className="row g-2 mb-3">
             <div className="col-md-6">
               <label htmlFor="search" className="form-label small text-secondary">Search</label>
-              <input
-                id="search"
-                type="search"
-                className="form-control"
-                placeholder="Search by name or email"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-              />
+              <div className="search-field">
+                <Icon name="search" size={16} />
+                <input
+                  id="search"
+                  type="search"
+                  className="form-control"
+                  placeholder="Search by name or email"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                />
+              </div>
             </div>
 
             <div className="col-md-3">
@@ -189,96 +194,112 @@ export default function UsersListPage() {
               action={<Link to="/users/new" className="btn btn-sm btn-primary">Add user</Link>}
             />
           ) : (
-            <div className="table-responsive">
-              <table className="table table-hover align-middle mb-0">
-                <thead>
-                  {/* text-nowrap keeps the headings on one line; the wrapper
-                      scrolls sideways on a narrow screen */}
-                  {/* Username, NIC, phone and date of birth are deliberately
-                      left out here; they are shown in the View dialog */}
-                  <tr className="text-secondary small text-uppercase text-nowrap">
-                    <th scope="col">Name</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Role</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Created</th>
-                    <th scope="col" className="text-end">Actions</th>
-                  </tr>
-                </thead>
+            <>
+              {/* A short count so officers can see how far the filters narrowed the list */}
+              <p className="text-secondary small mb-2">
+                {users.length} user{users.length === 1 ? '' : 's'} found
+              </p>
 
-                <tbody>
-                  {users.map((item) => {
-                    // A user may not deactivate their own account, so that
-                    // button is hidden on their own row
-                    const isSelf = item.id === currentUser?.id;
+              <div className="table-responsive">
+                <table className="table table-hover align-middle mb-0">
+                  <thead>
+                    {/* text-nowrap keeps the headings on one line; the wrapper
+                        scrolls sideways on a narrow screen */}
+                    {/* Username, NIC, phone and date of birth are deliberately
+                        left out here; they are shown in the View dialog */}
+                    <tr className="text-secondary small text-uppercase text-nowrap">
+                      <th scope="col">User</th>
+                      <th scope="col">Role</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Created</th>
+                      <th scope="col" className="text-end">Actions</th>
+                    </tr>
+                  </thead>
 
-                    return (
-                      <tr key={item.id}>
-                        <td className="fw-semibold">
-                          {item.fullName}
-                          {isSelf && <span className="badge text-bg-light border ms-2">You</span>}
-                        </td>
-                        <td className="text-secondary">{item.email}</td>
-                        <td><RoleBadge role={item.role} /></td>
-                        <td><StatusBadge isActive={item.isActive} /></td>
-                        <td className="text-secondary small">{formatDate(item.createdAt)}</td>
-                        <td className="text-end">
-                          <div className="btn-group btn-group-sm">
-                            <button
-                              type="button"
-                              className="btn btn-outline-primary"
-                              onClick={() => setViewingUser(item)}
-                            >
-                              View
-                            </button>
+                  <tbody>
+                    {users.map((item) => {
+                      // A user may not deactivate their own account, so that
+                      // button is hidden on their own row
+                      const isSelf = item.id === currentUser?.id;
 
-                            <button
-                              type="button"
-                              className="btn btn-outline-secondary"
-                              onClick={() => navigate(`/users/${item.id}/edit`)}
-                            >
-                              Edit
-                            </button>
-
-                            {item.isActive ? (
+                      return (
+                        <tr key={item.id}>
+                          <td>
+                            {/* Avatar, name and email together in one column */}
+                            <div className="d-flex align-items-center gap-3">
+                              <span className="avatar-circle avatar-circle-sm" aria-hidden="true">
+                                {initialsOf(item.fullName)}
+                              </span>
+                              <div className="lh-sm">
+                                <div className="fw-semibold">
+                                  {item.fullName}
+                                  {isSelf && <span className="badge text-bg-light border ms-2">You</span>}
+                                </div>
+                                <div className="text-secondary small">{item.email}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td><RoleBadge role={item.role} /></td>
+                          <td><StatusBadge isActive={item.isActive} /></td>
+                          <td className="text-secondary small">{formatDate(item.createdAt)}</td>
+                          <td className="text-end">
+                            <div className="btn-group btn-group-sm">
                               <button
                                 type="button"
-                                className="btn btn-outline-warning"
+                                className="btn btn-outline-primary"
+                                onClick={() => setViewingUser(item)}
+                              >
+                                View
+                              </button>
+
+                              <button
+                                type="button"
+                                className="btn btn-outline-secondary"
+                                onClick={() => navigate(`/users/${item.id}/edit`)}
+                              >
+                                Edit
+                              </button>
+
+                              {item.isActive ? (
+                                <button
+                                  type="button"
+                                  className="btn btn-outline-warning"
+                                  disabled={isSelf}
+                                  title={isSelf ? 'You cannot deactivate your own account' : undefined}
+                                  onClick={() => setPendingAction({ type: 'deactivate', user: item })}
+                                >
+                                  Deactivate
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  className="btn btn-outline-success"
+                                  onClick={() => setPendingAction({ type: 'activate', user: item })}
+                                >
+                                  Activate
+                                </button>
+                              )}
+
+                              {/* Deleting cannot be undone, so it is the last
+                                  button and always asks for confirmation */}
+                              <button
+                                type="button"
+                                className="btn btn-outline-danger"
                                 disabled={isSelf}
-                                title={isSelf ? 'You cannot deactivate your own account' : undefined}
-                                onClick={() => setPendingAction({ type: 'deactivate', user: item })}
+                                title={isSelf ? 'You cannot delete your own account' : undefined}
+                                onClick={() => setPendingAction({ type: 'delete', user: item })}
                               >
-                                Deactivate
+                                Delete
                               </button>
-                            ) : (
-                              <button
-                                type="button"
-                                className="btn btn-outline-success"
-                                onClick={() => setPendingAction({ type: 'activate', user: item })}
-                              >
-                                Activate
-                              </button>
-                            )}
-
-                            {/* Deleting cannot be undone, so it is the last
-                                button and always asks for confirmation */}
-                            <button
-                              type="button"
-                              className="btn btn-outline-danger"
-                              disabled={isSelf}
-                              title={isSelf ? 'You cannot delete your own account' : undefined}
-                              onClick={() => setPendingAction({ type: 'delete', user: item })}
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </div>
       </div>
