@@ -1,12 +1,14 @@
 package com.example.mobileapp
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 
 class LoginActivity : Activity() {
@@ -28,6 +30,10 @@ class LoginActivity : Activity() {
 
         btnTogglePassword.setOnClickListener { togglePasswordVisibility() }
         btnSignIn.setOnClickListener { attemptSignIn() }
+
+        findViewById<TextView>(R.id.tvGoToRegister).setOnClickListener {
+            startActivity(Intent(this, RegisterActivity::class.java))
+        }
 
         // Pressing "Done" on the keyboard in the password field acts like tapping Sign in
         etPassword.setOnEditorActionListener { _, actionId, _ ->
