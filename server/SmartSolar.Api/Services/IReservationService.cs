@@ -4,6 +4,9 @@
  * Layer:       Services
  * Author:      H. Bhathiya (IT22189530)
  * Created:     2026-09-22
+ * Modified:    2026-09-30 by Cooray B.D.A (IT22189530) — added the prosumer
+ *              operations used by the Android app (own reservations only,
+ *              Pending until approved, QR code released on approval).
  * Description: Contract for power trading reservation business logic.
  *              Enforces all domain business rules including the 7-day
  *              scheduling rule and the 12-hour notice rule for updates
@@ -62,4 +65,33 @@ public interface IReservationService
     /// Used to block node deactivation if active energy reservations exist.
     /// </summary>
     Task<bool> HasActiveReservationsForNodeAsync(string nodeId);
+
+    // -------------------------------------------------------------------------
+    // Prosumer operations (Android app). The NIC always comes from the token.
+    // -------------------------------------------------------------------------
+
+    /// <summary>
+    /// Lists the prosumer's own reservations, with optional status and search filters.
+    /// </summary>
+    Task<List<ReservationResponseDto>> GetForProsumerAsync(string nic, string? status, string? search);
+
+    /// <summary>
+    /// Returns one of the prosumer's own reservations.
+    /// </summary>
+    Task<ReservationResponseDto> GetForProsumerByIdAsync(string id, string nic);
+
+    /// <summary>
+    /// Requests a new reservation for the prosumer; it starts as Pending.
+    /// </summary>
+    Task<ReservationResponseDto> CreateForProsumerAsync(ProsumerReservationRequestDto dto, string nic);
+
+    /// <summary>
+    /// Changes the slot or energy of the prosumer's own reservation; it needs approval again.
+    /// </summary>
+    Task<ReservationResponseDto> UpdateForProsumerAsync(string id, UpdateReservationDto dto, string nic);
+
+    /// <summary>
+    /// Cancels the prosumer's own reservation (12-hour notice rule applies).
+    /// </summary>
+    Task<ReservationResponseDto> CancelForProsumerAsync(string id, ProsumerCancelReservationDto dto, string nic);
 }

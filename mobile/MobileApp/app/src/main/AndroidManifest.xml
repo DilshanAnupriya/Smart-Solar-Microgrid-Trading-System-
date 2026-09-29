@@ -43,17 +43,17 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ReservationsActivity"
+            android:name=".booking.ReservationsActivity"
             android:exported="false" />
         <activity
-            android:name=".ReservationFormActivity"
+            android:name=".booking.ReservationFormActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ReservationDetailActivity"
+            android:name=".booking.ReservationDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".ReservationSummaryActivity"
+            android:name=".booking.ReservationSummaryActivity"
             android:exported="false" />
     </application>
 

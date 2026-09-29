@@ -4,6 +4,8 @@
  * Layer:       Controllers
  * Author:      Vidura Hewaduwa
  * Created:     2026-09-24
+ * Modified:    2026-09-30 by Cooray B.D.A (IT22189530) — prosumers may list
+ *              nodes too (active nodes only), for the Android booking screen.
  * Description: REST endpoints for microgrid node management. Role attributes
  *              enforce permissions while NodeService enforces business rules.
  */
@@ -30,11 +32,20 @@ public class NodesController : ControllerBase
         _nodeService = nodeService;
     }
 
-    /// <summary>GET api/nodes — staff list with optional search and status filters.</summary>
+    /// <summary>
+    /// GET api/nodes — node list with optional search and status filters. Staff see every
+    /// node; a prosumer choosing where to book only ever sees active nodes.
+    /// </summary>
     [HttpGet]
-    [Authorize(Roles = "Backoffice,GridOperator")]
+    [Authorize(Roles = "Backoffice,GridOperator,Prosumer")]
     public async Task<IActionResult> GetAll([FromQuery] string? search, [FromQuery] bool? isActive)
     {
+        // An inactive node cannot take reservations, so it is never offered to a prosumer
+        if (User.IsInRole("Prosumer"))
+        {
+            isActive = true;
+        }
+
         var result = await _nodeService.GetAllAsync(search, isActive);
         return Ok(ApiResponse<List<NodeResponseDto>>.Ok(result, $"{result.Count} node(s) found."));
     }

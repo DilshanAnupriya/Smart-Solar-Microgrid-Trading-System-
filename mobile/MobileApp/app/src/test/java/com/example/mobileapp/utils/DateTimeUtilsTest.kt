@@ -57,6 +57,13 @@ class DateTimeUtilsTest {
     }
 
     @Test
+    fun formatIsoUtc_isTheUtcFormTheApiExpects() {
+        // Always UTC with a "Z", whatever the phone's time zone, and readable back
+        assertEquals("2026-09-29T04:30:00Z", DateTimeUtils.formatIsoUtc(sampleMillis))
+        assertEquals(sampleMillis, DateTimeUtils.parseIsoToMillis(DateTimeUtils.formatIsoUtc(sampleMillis)))
+    }
+
+    @Test
     fun formatDate_usesSriLankaTime() {
         // 20:00 UTC on 29 Sep is already 01:30 on 30 Sep in Sri Lanka; US English month names
         // keep the expected text the same on every computer

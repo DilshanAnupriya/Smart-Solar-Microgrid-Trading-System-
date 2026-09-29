@@ -68,6 +68,26 @@ object DateTimeUtils {
     }
 
     /**
+     * e.g. "Tue, 30 Sep 2026", in Sri Lanka time.
+     */
+    fun formatDayDate(millis: Long): String {
+        // Same as formatDate, with the day of the week in front
+        val format = SimpleDateFormat("EEE, d MMM yyyy", Locale.getDefault())
+        format.timeZone = SRI_LANKA
+        return format.format(Date(millis))
+    }
+
+    /**
+     * e.g. "2026-10-02T04:30:00Z": the UTC form the API expects in request bodies.
+     */
+    fun formatIsoUtc(millis: Long): String {
+        // Always UTC with a "Z", so the API never has to guess the time zone
+        val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
+        format.timeZone = UTC
+        return format.format(Date(millis))
+    }
+
+    /**
      * Offset of a "+05:30", "-0100" or "Z" suffix in milliseconds; no suffix means UTC.
      */
     private fun offsetMillis(zone: String): Long {
