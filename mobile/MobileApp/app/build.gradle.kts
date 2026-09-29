@@ -33,6 +33,8 @@ android {
 
 dependencies {
     implementation(libs.androidx.core.ktx)
+    // ZXing core: plain Java library used only to draw the reservation QR code
+    implementation(libs.zxing.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)

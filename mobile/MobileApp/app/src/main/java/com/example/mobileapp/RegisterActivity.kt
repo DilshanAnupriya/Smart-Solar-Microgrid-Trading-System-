@@ -88,29 +88,18 @@ class RegisterActivity : Activity() {
         val confirmPassword = etConfirmPassword.text.toString()
 
         // Check every field so all problems show at once, in the order they appear on screen
-        val checks = listOf(
-            etNic to ProsumerValidator.validateNic(nic),
-            etFullName to ProsumerValidator.validateFullName(fullName),
-            etEmail to ProsumerValidator.validateEmail(email),
-            etPhone to ProsumerValidator.validatePhone(phone),
-            etAddress to ProsumerValidator.validateAddress(address),
-            etPassword to ProsumerValidator.validatePassword(password),
-            etConfirmPassword to ProsumerValidator.validateConfirmPassword(password, confirmPassword)
+        val isValid = showFieldErrors(
+            listOf(
+                etNic to ProsumerValidator.validateNic(nic),
+                etFullName to ProsumerValidator.validateFullName(fullName),
+                etEmail to ProsumerValidator.validateEmail(email),
+                etPhone to ProsumerValidator.validatePhone(phone),
+                etAddress to ProsumerValidator.validateAddress(address),
+                etPassword to ProsumerValidator.validatePassword(password),
+                etConfirmPassword to ProsumerValidator.validateConfirmPassword(password, confirmPassword)
+            )
         )
-
-        var firstInvalidField: EditText? = null
-        for ((field, errorRes) in checks) {
-            field.error = errorRes?.let { getString(it) }
-            if (errorRes != null && firstInvalidField == null) {
-                firstInvalidField = field
-            }
-        }
-
-        // Focusing the first invalid field scrolls it into view and opens its error message
-        if (firstInvalidField != null) {
-            firstInvalidField.requestFocus()
-            return
-        }
+        if (!isValid) return
 
         // Show the NIC in the same normalised form the server will store (e.g. 991234567V)
         etNic.setText(nic)

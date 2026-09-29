@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Reservation details card, included on the detail and summary pages.
+     Filled in code by bindReservationDetails() in ReservationViews.kt -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_card"
+    android:orientation="vertical">
+
+    <LinearLayout style="@style/ProfileRow">
+
+        <TextView
+            style="@style/ProfileLabel"
+            android:text="@string/reservation_detail_node" />
+
+        <TextView
+            android:id="@+id/tvDetailNode"
+            style="@style/ProfileValue" />
+
+        <TextView
+            android:id="@+id/tvDetailNodeLocation"
+            style="@style/FormHelper"
+            android:layout_marginTop="2dp" />
+    </LinearLayout>
+
+    <View style="@style/Divider" />
+
+    <LinearLayout style="@style/ProfileRow">
+
+        <TextView
+            style="@style/ProfileLabel"
+            android:text="@string/reservation_detail_type" />
+
+        <TextView
+            android:id="@+id/tvDetailType"
+            style="@style/ProfileValue" />
+    </LinearLayout>
+
+    <View style="@style/Divider" />
+
+    <LinearLayout style="@style/ProfileRow">
+
+        <TextView
+            style="@style/ProfileLabel"
+            android:text="@string/reservation_detail_date" />
+
+        <TextView
+            android:id="@+id/tvDetailDate"
+            style="@style/ProfileValue" />
+    </LinearLayout>
+
+    <View style="@style/Divider" />
+
+    <!-- Time and duration side by side to keep the card short -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            style="@style/ProfileRow"
+            android:layout_width="0dp"
+            android:layout_weight="1">
+
+            <TextView
+                style="@style/ProfileLabel"
+                android:text="@string/reservation_detail_time" />
+
+            <TextView
+                android:id="@+id/tvDetailTime"
+                style="@style/ProfileValue" />
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/ProfileRow"
+            android:layout_width="0dp"
+            android:layout_weight="1">
+
+            <TextView
+                style="@style/ProfileLabel"
+                android:text="@string/reservation_detail_duration" />
+
+            <TextView
+                android:id="@+id/tvDetailDuration"
+                style="@style/ProfileValue" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View style="@style/Divider" />
+
+    <LinearLayout style="@style/ProfileRow">
+
+        <TextView
+            style="@style/ProfileLabel"
+            android:text="@string/reservation_detail_energy" />
+
+        <TextView
+            android:id="@+id/tvDetailEnergy"
+            style="@style/ProfileValue" />
+    </LinearLayout>
+</LinearLayout>

@@ -27,6 +27,26 @@
             android:name=".RegisterActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EditProfileActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ReservationsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ReservationFormActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ReservationDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ReservationSummaryActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
