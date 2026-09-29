@@ -18,7 +18,7 @@ import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.example.mobileapp.R
-import com.example.mobileapp.ReservationsActivity
+import com.example.mobileapp.booking.ReservationsActivity
 import com.example.mobileapp.models.LocalUser
 import com.example.mobileapp.models.Prosumer
 import com.example.mobileapp.network.ApiResult

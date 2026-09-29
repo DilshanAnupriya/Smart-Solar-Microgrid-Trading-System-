@@ -103,6 +103,7 @@
         <item quantity="one">%d hour</item>
         <item quantity="other">%d hours</item>
     </plurals>
+    <string name="reservation_duration_minutes">%d min</string>
 
     <!-- My reservations -->
     <string name="reservations_title">My reservations</string>
@@ -110,12 +111,13 @@
     <string name="reservations_new">New</string>
     <string name="reservations_upcoming">Upcoming</string>
     <string name="reservations_past">Past and cancelled</string>
+    <string name="reservations_offline_banner">%1$s\nShowing the reservations saved on this phone. Tap here to try again.</string>
     <string name="reservations_empty">You have no reservations yet. Tap New to reserve an energy slot.</string>
 
     <!-- New / modify reservation form -->
     <string name="reservation_form_new_title">New reservation</string>
     <string name="reservation_form_modify_title">Modify reservation</string>
-    <string name="reservation_form_modify_note">Reservation %1$s. Your changes need a grid operator\'s approval again, and the current QR code will stop working.</string>
+    <string name="reservation_form_modify_note">Reservation %1$s. You can change the date, time, duration and energy; the grid node and type stay the same. Your changes need approval again, and the current QR code will stop working.</string>
     <string name="reservation_node_label">Grid node</string>
     <string name="reservation_node_hint">Choose a grid node</string>
     <string name="reservation_type_label">Reservation type</string>
@@ -127,12 +129,22 @@
     <string name="reservation_duration_label">Duration</string>
     <string name="reservation_energy_label">Energy amount (kWh)</string>
     <string name="reservation_energy_hint">e.g. 10</string>
-    <string name="reservation_energy_helper">Between 1 and 100 kWh.</string>
+    <string name="reservation_energy_helper">The energy you will drop off or draw during the slot.</string>
     <string name="reservation_submit_new">Request reservation</string>
     <string name="reservation_submit_modify">Save changes</string>
+    <string name="reservation_submitting">Sending…</string>
+    <string name="reservation_nodes_loading">Loading grid nodes…</string>
+    <string name="reservation_nodes_empty">No grid nodes are taking reservations right now.</string>
+    <string name="reservation_nodes_saved">Couldn\'t reach the server, so these are the grid nodes saved on this phone.</string>
+    <string name="reservation_node_option">%1$s\n%2$s · %3$s</string>
+    <plurals name="reservation_node_slots">
+        <item quantity="one">%d free slot</item>
+        <item quantity="other">%d free slots</item>
+    </plurals>
 
     <!-- Reservation detail -->
     <string name="reservation_detail_title">Reservation</string>
+    <string name="reservation_offline_banner">%1$s\nShowing the copy saved on this phone. Tap here to try again.</string>
     <string name="reservation_modify">Modify</string>
     <string name="reservation_cancel">Cancel</string>
     <string name="reservation_locked_banner">This reservation starts in less than 12 hours, so it can no longer be modified or cancelled in the app. Please contact a grid operator.</string>
@@ -150,7 +162,6 @@
     <string name="reservation_cancel_message">Your slot at %1$s on %2$s will be released. This can\'t be undone.</string>
     <string name="reservation_cancel_confirm">Cancel reservation</string>
     <string name="reservation_cancel_keep">Keep it</string>
-    <string name="reservation_change_locked">This reservation starts in less than 12 hours, so it can no longer be changed.</string>
 
     <!-- Summary page after create / modify / cancel -->
     <string name="summary_created_title">Reservation requested</string>
@@ -165,10 +176,8 @@
     <!-- Reservation form errors -->
     <string name="error_node_required">Choose a grid node.</string>
     <string name="error_start_required">Choose a date and a start time.</string>
-    <string name="error_start_in_past">That start time has already passed.</string>
-    <string name="error_start_too_far">Reservations must start within the next 7 days.</string>
     <string name="error_energy_required">Enter the energy amount.</string>
-    <string name="error_energy_range">Enter an amount between 1 and 100 kWh.</string>
+    <string name="error_energy_positive">Enter an amount greater than 0.</string>
 
     <!-- Prosumer form errors. Only "required" and the password match are checked on the
          phone; format and length problems come from the API and are shown on the field. -->

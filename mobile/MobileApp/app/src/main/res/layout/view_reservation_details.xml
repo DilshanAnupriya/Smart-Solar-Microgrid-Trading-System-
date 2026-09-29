@@ -16,11 +16,6 @@
         <TextView
             android:id="@+id/tvDetailNode"
             style="@style/ProfileValue" />
-
-        <TextView
-            android:id="@+id/tvDetailNodeLocation"
-            style="@style/FormHelper"
-            android:layout_marginTop="2dp" />
     </LinearLayout>
 
     <View style="@style/Divider" />

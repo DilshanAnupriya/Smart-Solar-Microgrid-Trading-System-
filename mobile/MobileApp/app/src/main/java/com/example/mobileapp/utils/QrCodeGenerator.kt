@@ -1,4 +1,16 @@
-package com.example.mobileapp
+/*
+ * File:        QrCodeGenerator.kt
+ * Project:     Smart Solar Microgrid Trading System (SE4040)
+ * Layer:       Utils
+ * Author:      N. Jayasinghe (IT2XXXXXXX)
+ * Created:     2026-09-29
+ * Modified:    2026-09-30 by Cooray B.D.A (IT22189530) — moved to utils; it now
+ *              only ever draws the token issued by the API.
+ * Description: Draws a QR code bitmap with the ZXing core library
+ *              (https://github.com/zxing/zxing, Apache License 2.0).
+ */
+
+package com.example.mobileapp.utils
 
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -8,17 +20,19 @@ import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 
 /**
- * Draws QR codes using the ZXing core library (https://github.com/zxing/zxing).
  * ZXing works out which squares are dark; this class just paints them into a Bitmap.
+ * The content is always the server's token, exactly as received: the QR is never built
+ * on the phone, so the grid operator's scan can be verified against the API.
  */
 object QrCodeGenerator {
 
-    /** Returns a square black-on-white QR code of [sizePx] x [sizePx] pixels. */
+    /**
+     * Returns a square black-on-white QR code of [sizePx] x [sizePx] pixels.
+     */
     fun generate(content: String, sizePx: Int): Bitmap {
+        // Level M still scans if about 15% of the code is damaged or glared; a 1-module quiet zone
         val hints = mapOf(
-            // Level M still scans if about 15% of the code is damaged or glared
             EncodeHintType.ERROR_CORRECTION to ErrorCorrectionLevel.M,
-            // Quiet zone around the code, in QR modules
             EncodeHintType.MARGIN to 1
         )
         val matrix = QRCodeWriter().encode(content, BarcodeFormat.QR_CODE, sizePx, sizePx, hints)

@@ -4,6 +4,8 @@
  * Layer:       Session
  * Author:      Cooray B.D.A (IT22189530)
  * Created:     2026-09-29
+ * Modified:    2026-09-30 by Cooray B.D.A (IT22189530) — sign-out also clears
+ *              the cached reservations and nodes.
  * Description: The signed-in session, kept in SQLite through LocalUserDao so the
  *              user stays signed in after the app is closed. Gives the token to
  *              ApiClient and the role and NIC to the screens.
@@ -14,6 +16,8 @@ package com.example.mobileapp.sessions
 import android.content.Context
 import com.example.mobileapp.db.DbHelper
 import com.example.mobileapp.db.LocalUserDao
+import com.example.mobileapp.db.NodeCacheDao
+import com.example.mobileapp.db.ReservationCacheDao
 import com.example.mobileapp.models.LocalUser
 import com.example.mobileapp.models.Prosumer
 import com.example.mobileapp.utils.DateTimeUtils
@@ -25,6 +29,8 @@ import com.example.mobileapp.utils.DateTimeUtils
 class SessionManager(context: Context) {
 
     private val localUserDao = LocalUserDao(DbHelper.getInstance(context))
+    private val reservationCacheDao = ReservationCacheDao(DbHelper.getInstance(context))
+    private val nodeCacheDao = NodeCacheDao(DbHelper.getInstance(context))
 
     /**
      * Stores the account returned by a successful login.
@@ -87,11 +93,14 @@ class SessionManager(context: Context) {
     }
 
     /**
-     * Signs out on this phone: removes the saved account and its token.
+     * Signs out on this phone: removes the saved account, its token and the cached data,
+     * so the next person to sign in never sees this user's reservations.
      */
     fun clearSession() {
         // The account itself is untouched on the server
         localUserDao.clear()
+        reservationCacheDao.clear()
+        nodeCacheDao.clear()
     }
 
     companion object {

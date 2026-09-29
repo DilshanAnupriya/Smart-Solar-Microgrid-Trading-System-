@@ -22,6 +22,15 @@
             android:layout_marginStart="4dp"
             android:text="@string/reservations_title" />
 
+        <!-- Spins while the API is being called -->
+        <ProgressBar
+            android:id="@+id/progressLoading"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginEnd="12dp"
+            android:visibility="gone" />
+
         <Button
             android:id="@+id/btnNew"
             style="@style/SmallButton.PrimaryOutline"
@@ -43,6 +52,17 @@
             android:orientation="vertical"
             android:paddingHorizontal="16dp"
             android:paddingBottom="16dp">
+
+            <!-- Shown when the API can't be reached: the list below is the copy saved in SQLite. Tapping it tries again. -->
+            <TextView
+                android:id="@+id/tvOfflineBanner"
+                style="@style/Banner"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_banner_warning"
+                android:clickable="true"
+                android:focusable="true"
+                android:textColor="@color/warning_text"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/tvEmpty"

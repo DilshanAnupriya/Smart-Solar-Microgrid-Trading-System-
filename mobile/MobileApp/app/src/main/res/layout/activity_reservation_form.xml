@@ -189,6 +189,15 @@
                 style="@style/FormHelper"
                 android:text="@string/reservation_energy_helper" />
 
+            <!-- The API's reason when the reservation is refused, e.g. the 7-day or 12-hour rule -->
+            <TextView
+                android:id="@+id/tvFormError"
+                style="@style/Banner"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_banner_danger"
+                android:textColor="@color/danger_text"
+                android:visibility="gone" />
+
             <Button
                 android:id="@+id/btnSubmit"
                 style="@style/WideButton.Primary"
