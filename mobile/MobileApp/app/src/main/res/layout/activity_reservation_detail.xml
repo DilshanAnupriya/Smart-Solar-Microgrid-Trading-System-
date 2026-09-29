@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One reservation: Modify / Cancel in the top bar (only while the 12-hour rule allows),
+     the transaction QR code once approved, and the reservation details -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <LinearLayout style="@style/TopBar">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/reservations_back"
+            android:src="@drawable/ic_arrow_back" />
+
+        <TextView
+            style="@style/TopBarTitle"
+            android:layout_marginStart="4dp"
+            android:text="@string/reservation_detail_title" />
+
+        <Button
+            android:id="@+id/btnModify"
+            style="@style/SmallButton.PrimaryOutline"
+            android:text="@string/reservation_modify" />
+
+        <!-- "Cancel" here means cancel the reservation, not close a dialog,
+             so lint's dialog button-order rule doesn't apply -->
+        <Button
+            android:id="@+id/btnCancel"
+            style="@style/SmallButton.DangerOutline"
+            tools:ignore="ButtonOrder"
+            android:layout_marginStart="8dp"
+            android:text="@string/reservation_cancel" />
+    </LinearLayout>
+
+    <View style="@style/Divider" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/page_background"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Reservation id and status -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvReservationId"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@color/text_dark"
+                    android:textIsSelectable="true"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvStatus"
+                    style="@style/StatusBadge" />
+            </LinearLayout>
+
+            <!-- Within 12 hours of the start: explains why Modify / Cancel are gone -->
+            <TextView
+                android:id="@+id/tvLockedBanner"
+                style="@style/Banner"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_banner_warning"
+                android:text="@string/reservation_locked_banner"
+                android:textColor="@color/warning_text"
+                android:visibility="gone" />
+
+            <!-- Pending: the QR code isn't available yet -->
+            <TextView
+                android:id="@+id/tvPendingBanner"
+                style="@style/Banner"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_banner_info"
+                android:text="@string/reservation_pending_banner"
+                android:textColor="@color/info_text"
+                android:visibility="gone" />
+
+            <!-- Approved: transaction QR code for the grid operator to scan -->
+            <LinearLayout
+                android:id="@+id/cardQr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_card"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:padding="20dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/reservation_qr_title"
+                    android:textColor="@color/text_dark"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/ivQr"
+                    android:contentDescription="@string/reservation_qr_title"
+                    android:layout_width="@dimen/qr_code_size"
+                    android:layout_height="@dimen/qr_code_size"
+                    android:layout_marginTop="16dp"
+                    android:scaleType="fitCenter" />
+
+                <TextView
+                    android:id="@+id/tvQrCode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.1"
+                    android:textColor="@color/text_dark"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="@string/reservation_qr_hint"
+                    android:textColor="@color/text_muted"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <include
+                android:id="@+id/details"
+                layout="@layout/view_reservation_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

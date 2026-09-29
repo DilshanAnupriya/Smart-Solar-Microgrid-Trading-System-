@@ -28,6 +28,7 @@ class ProfileActivity : Activity() {
     private lateinit var tvMemberSince: TextView
     private lateinit var btnEdit: Button
     private lateinit var btnDeactivate: Button
+    private lateinit var cardReservations: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,12 +46,16 @@ class ProfileActivity : Activity() {
         tvMemberSince = findViewById(R.id.tvMemberSince)
         btnEdit = findViewById(R.id.btnEdit)
         btnDeactivate = findViewById(R.id.btnDeactivate)
+        cardReservations = findViewById(R.id.cardReservations)
 
         // After a rotation, keep any edits made on this screen instead of reloading
         prosumer = savedInstanceState?.let { Prosumer.fromBundle(it) } ?: SAMPLE_PROSUMER
 
         btnEdit.setOnClickListener { openEditProfile() }
         btnDeactivate.setOnClickListener { confirmDeactivation() }
+        cardReservations.setOnClickListener {
+            startActivity(Intent(this, ReservationsActivity::class.java))
+        }
 
         showProsumer()
     }
@@ -94,6 +99,8 @@ class ProfileActivity : Activity() {
         val actionsVisibility = if (prosumer.isActive) View.VISIBLE else View.GONE
         btnEdit.visibility = actionsVisibility
         btnDeactivate.visibility = actionsVisibility
+        // A deactivated account can't trade energy, so it can't reach reservations either
+        cardReservations.visibility = actionsVisibility
         tvDeactivatedBanner.visibility = if (prosumer.isActive) View.GONE else View.VISIBLE
     }
 
