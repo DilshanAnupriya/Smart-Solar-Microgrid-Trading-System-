@@ -4,8 +4,10 @@
  * Layer:       Services
  * Author:      N. Jayasinghe (IT2XXXXXXX)
  * Created:     2026-09-20
- * Description: Contract for authentication: signing a web user in, reading the
- *              signed in user, and changing a password.
+ * Modified:    2026-09-29 by N. Jayasinghe (IT2XXXXXXX) — added prosumer
+ *              login for the Android app.
+ * Description: Contract for authentication: signing a web user or a prosumer
+ *              in, reading the signed in user, and changing a password.
  */
 
 using SmartSolar.Api.DTOs;
@@ -18,6 +20,11 @@ public interface IAuthService
     /// Verifies credentials and returns a signed token on success.
     /// </summary>
     Task<LoginResponseDto> LoginAsync(LoginRequestDto dto);
+
+    /// <summary>
+    /// Verifies a prosumer's NIC (or email) and password and returns a signed token.
+    /// </summary>
+    Task<ProsumerLoginResponseDto> ProsumerLoginAsync(ProsumerLoginRequestDto dto);
 
     /// <summary>
     /// Returns the profile of the user identified by the supplied token id.

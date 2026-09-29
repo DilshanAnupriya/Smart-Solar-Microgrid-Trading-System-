@@ -4,6 +4,8 @@
  * Layer:       Controllers
  * Author:      N. Jayasinghe (IT2XXXXXXX)
  * Created:     2026-09-20
+ * Modified:    2026-09-29 by N. Jayasinghe (IT2XXXXXXX) — added the prosumer
+ *              login endpoint used by the Android app.
  * Description: Authentication endpoints used by both the React web client and
  *              the Android client. The controller only reads the request, calls
  *              the service and returns the result; all rules are in AuthService.
@@ -46,6 +48,24 @@ public class AuthController : ControllerBase
         // Invalid credentials and deactivated accounts are turned into 401 and
         // 403 by the exception handling middleware
         var result = await _authService.LoginAsync(dto);
+
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// POST api/auth/prosumer-login — signs a prosumer in from the Android app
+    /// with their NIC or email and returns a JWT carrying the Prosumer role.
+    /// </summary>
+    [HttpPost("prosumer-login")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ProsumerLoginResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> ProsumerLogin([FromBody] ProsumerLoginRequestDto dto)
+    {
+        // Wrong credentials and deactivated accounts become 401 and 403 in the
+        // exception handling middleware, exactly like the web login
+        var result = await _authService.ProsumerLoginAsync(dto);
 
         return Ok(result);
     }
