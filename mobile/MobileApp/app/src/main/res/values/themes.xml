@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.MobileApp" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.MobileApp" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/white</item>
+        <!-- Dark status bar icons, since the screen background is white -->
+        <item name="android:windowLightStatusBar">true</item>
+        <!-- Cursor, text selection handles and focus colour -->
+        <item name="android:colorAccent">@color/primary</item>
+    </style>
 </resources>

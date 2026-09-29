@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">MobileApp</string>
+
+    <!-- Login screen -->
+    <string name="login_title">Smart Solar Microgrid</string>
+    <string name="login_subtitle">Sign in to the management console</string>
+    <string name="login_identifier_label">Email, username or phone number</string>
+    <string name="login_identifier_hint">you@smartsolar.lk, username or 0771234567</string>
+    <string name="login_password_label">Password</string>
+    <string name="login_password_hint">Enter your password</string>
+    <string name="login_show_password">Show</string>
+    <string name="login_hide_password">Hide</string>
+    <string name="login_sign_in">Sign in</string>
+    <string name="login_logo_description">Smart Solar Microgrid logo</string>
+    <string name="login_error_identifier_required">Enter your email, username or phone number</string>
+    <string name="login_error_password_required">Enter your password</string>
+    <string name="login_not_connected">Sign-in is not connected to the server yet</string>
 </resources>
