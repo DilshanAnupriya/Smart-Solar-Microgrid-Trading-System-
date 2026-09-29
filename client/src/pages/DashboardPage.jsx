@@ -25,7 +25,9 @@ import { initialsOf } from '../utils/formatters';
 // Shortcuts shown in the "Quick actions" card
 const QUICK_ACTIONS = [
   { to: '/users/new', icon: 'plus', title: 'Add a user', text: 'Create a Backoffice or Grid Operator account' },
+  { to: '/nodes/new', icon: 'plus', title: 'Add a node', text: 'Register a new microgrid hub' },
   { to: '/users', icon: 'users', title: 'Manage users', text: 'Search, edit, deactivate or reactivate accounts' },
+  { to: '/nodes', icon: 'node', title: 'Manage nodes', text: 'Microgrid hubs, schedules and battery slots' },
   { to: '/prosumers', icon: 'sun', title: 'Prosumers', text: 'Review solar prosumer accounts' },
   { to: '/profile', icon: 'user', title: 'My profile', text: 'Your details and password' },
 ];

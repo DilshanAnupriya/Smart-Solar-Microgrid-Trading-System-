@@ -41,6 +41,13 @@ const ICONS = {
     </>
   ),
   bolt: <path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z" />,
+  // Hexagon with a bolt, for microgrid nodes
+  node: (
+    <>
+      <path d="M12 2.5 20.5 7.3v9.4L12 21.5l-8.5-4.8V7.3L12 2.5z" />
+      <path d="m12.8 7.5-3.3 5h3l-.8 4 3.3-5h-3l.8-4z" />
+    </>
+  ),
   shield: (
     <>
       <path d="M12 3 4.5 6v5.5c0 4.6 3.1 8.2 7.5 9.5 4.4-1.3 7.5-4.9 7.5-9.5V6L12 3z" />

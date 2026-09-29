@@ -27,6 +27,11 @@ import ProfilePage from './pages/ProfilePage';
 import ProsumerDetailPage from './pages/prosumers/ProsumerDetailPage';
 import ProsumerFormPage from './pages/prosumers/ProsumerFormPage';
 import ProsumerListPage from './pages/prosumers/ProsumerListPage';
+import NodeDetailsPage from './pages/nodes/NodeDetailsPage';
+import NodeFormPage from './pages/nodes/NodeFormPage';
+import NodeSchedulePage from './pages/nodes/NodeSchedulePage';
+import NodeSlotsPage from './pages/nodes/NodeSlotsPage';
+import NodesListPage from './pages/nodes/NodesListPage';
 import UserFormPage from './pages/users/UserFormPage';
 import UsersListPage from './pages/users/UsersListPage';
 import { ROLES } from './utils/constants';
@@ -65,6 +70,24 @@ export default function App() {
             <Route path="prosumers/new" element={<ProsumerFormPage />} />
             <Route path="prosumers/:nic" element={<ProsumerDetailPage />} />
             <Route path="prosumers/:nic/edit" element={<ProsumerFormPage />} />
+          </Route>
+
+          {/* Node information is visible to both staff roles. */}
+          <Route element={<RoleRoute allowed={[ROLES.BACKOFFICE, ROLES.GRID_OPERATOR]} />}>
+            <Route path="nodes" element={<NodesListPage />} />
+            <Route path="nodes/:id" element={<NodeDetailsPage />} />
+          </Route>
+
+          {/* Node creation, editing, schedules and status are Backoffice tasks. */}
+          <Route element={<RoleRoute allowed={[ROLES.BACKOFFICE]} />}>
+            <Route path="nodes/new" element={<NodeFormPage />} />
+            <Route path="nodes/:id/edit" element={<NodeFormPage />} />
+            <Route path="nodes/:id/schedule" element={<NodeSchedulePage />} />
+          </Route>
+
+          {/* Live battery availability is maintained by Grid Operators. */}
+          <Route element={<RoleRoute allowed={[ROLES.GRID_OPERATOR]} />}>
+            <Route path="nodes/:id/slots" element={<NodeSlotsPage />} />
           </Route>
 
           {/* Available to both roles */}

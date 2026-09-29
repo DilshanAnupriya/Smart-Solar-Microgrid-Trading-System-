@@ -45,3 +45,9 @@ export const PROSUMER_STATUS_OPTIONS = [
   { value: PROSUMER_STATUS.ACTIVE, label: 'Active' },
   { value: PROSUMER_STATUS.DEACTIVATED, label: 'Deactivated' },
 ];
+
+// Microgrid nodes use soft deletion, represented by the boolean isActive field
+export const NODE_STATUS = {
+  ACTIVE: 'Active',
+  INACTIVE: 'Inactive',
+};
