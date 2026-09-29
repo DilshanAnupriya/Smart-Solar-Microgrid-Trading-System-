@@ -16,6 +16,10 @@ import { useToast } from '../toast/useToast';
 import { canRoleAccess, homePathFor } from '../utils/navigation';
 import { validateLoginForm } from '../utils/validators';
 
+// Background clip served from client/public/videos. If the file is missing the
+// video simply stays empty and the navy gradient behind it shows instead.
+const LOGIN_VIDEO_URL = `${import.meta.env.BASE_URL}videos/login-background.mp4`;
+
 export default function LoginPage() {
   const { isAuthenticated, user, login } = useAuth();
   const { showSuccess, showError } = useToast();
@@ -87,12 +91,20 @@ export default function LoginPage() {
 
   return (
     <div className="login-page d-flex align-items-center justify-content-center min-vh-100 p-3">
-      <div className="card login-card border-0 shadow-lg">
+      {/* Decorative background: muted so browsers allow autoplay, hidden from screen readers */}
+      <video className="login-video" autoPlay muted loop playsInline aria-hidden="true">
+        <source src={LOGIN_VIDEO_URL} type="video/mp4" />
+      </video>
+
+      {/* Dark tint over the video so the white text on the glass card stays readable */}
+      <div className="login-video-overlay" aria-hidden="true" />
+
+      <div className="card login-card login-card-glass border-0 shadow-lg">
         <div className="card-body p-4 p-md-5">
           <div className="text-center mb-4">
             <span className="brand-mark brand-mark-lg d-inline-flex mb-3" aria-hidden="true">&#9728;</span>
             <h1 className="h4 fw-semibold mb-1">Smart Solar Microgrid</h1>
-            <p className="text-secondary small mb-0">Sign in to the management console</p>
+            <p className="login-subtitle small mb-0">Sign in to the management console</p>
           </div>
 
           <form onSubmit={handleSubmit} noValidate>
@@ -132,7 +144,7 @@ export default function LoginPage() {
                 />
                 <button
                   type="button"
-                  className="btn btn-outline-secondary"
+                  className="btn btn-outline-light"
                   onClick={() => setShowPassword((previous) => !previous)}
                   disabled={submitting}
                 >

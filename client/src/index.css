@@ -102,14 +102,68 @@ body {
 
 /* ---------------------------------------------------------------- Login -- */
 
+/* The gradient stays as the fallback while the video loads, or if it is missing */
 .login-page {
   background: linear-gradient(135deg, var(--ss-navy) 0%, var(--ss-navy-soft) 100%);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Full-screen background video, cropped to fill the page like background-size: cover */
+.login-video {
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  position: absolute;
+  width: 100%;
+  z-index: 0;
+}
+
+.login-video-overlay {
+  background-color: rgba(16, 36, 62, 0.55);
+  inset: 0;
+  position: absolute;
+  z-index: 1;
 }
 
 .login-card {
   border-radius: 1rem;
   max-width: 26rem;
   width: 100%;
+}
+
+/* Frosted glass: 20% white fill (80% transparent) with the video blurred behind it */
+.login-card-glass {
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  color: #fff;
+  position: relative;
+  z-index: 2;
+}
+
+.login-card-glass .login-subtitle {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Bootstrap's red is hard to read on the dark glass, so use a lighter tint */
+.login-card-glass .invalid-feedback {
+  color: #ffc9ce;
+}
+
+/* Browsers without backdrop-filter can't blur, so make the card darker to keep text readable */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .login-card-glass {
+    background-color: rgba(16, 36, 62, 0.75);
+  }
+}
+
+/* Respect the "reduce motion" setting: no moving background, just the gradient */
+@media (prefers-reduced-motion: reduce) {
+  .login-video {
+    display: none;
+  }
 }
 
 /* --------------------------------------------------------------- Tables -- */
