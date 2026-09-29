@@ -44,7 +44,7 @@
                 android:textColor="@color/text_muted"
                 android:textSize="15sp" />
 
-            <!-- Email / username / phone -->
+            <!-- NIC or email -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -117,6 +117,15 @@
                     android:textColor="@color/btn_outline_text"
                     android:textSize="16sp" />
             </LinearLayout>
+
+            <!-- The API's reason when sign-in fails, e.g. wrong details or a deactivated account -->
+            <TextView
+                android:id="@+id/tvFormError"
+                style="@style/Banner"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_banner_danger"
+                android:textColor="@color/danger_text"
+                android:visibility="gone" />
 
             <Button
                 android:id="@+id/btnSignIn"

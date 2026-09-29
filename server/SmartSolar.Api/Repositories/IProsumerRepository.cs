@@ -4,6 +4,8 @@
  * Layer:       Repositories
  * Author:      Dilshan Anupriya (IT22189530)
  * Created:     2026-09-20
+ * Modified:    2026-09-29 by N. Jayasinghe (IT2XXXXXXX) — added the email
+ *              lookup used by prosumer login.
  * Description: Contract for reading and writing prosumer documents in MongoDB.
  */
 
@@ -15,6 +17,9 @@ public interface IProsumerRepository
 {
     /// <summary>Returns the prosumer with the given NIC, or null if none exists.</summary>
     Task<Prosumer?> GetByNicAsync(string nic);
+
+    /// <summary>Returns the prosumer with the given (lowercase) email, or null if none exists.</summary>
+    Task<Prosumer?> GetByEmailAsync(string email);
 
     /// <summary>Returns prosumers matching an optional search term and status.</summary>
     Task<List<Prosumer>> GetAllAsync(string? search, ProsumerStatus? status);

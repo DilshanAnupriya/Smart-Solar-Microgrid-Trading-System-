@@ -4,6 +4,8 @@
  * Layer:       Repositories
  * Author:      Dilshan Anupriya (IT22189530)
  * Created:     2026-09-20
+ * Modified:    2026-09-29 by N. Jayasinghe (IT2XXXXXXX) — added the email
+ *              lookup used by prosumer login.
  * Description: MongoDB implementation of IProsumerRepository. Handles data
  *              access only; all business rules live in ProsumerService.
  */
@@ -36,6 +38,15 @@ public class ProsumerRepository : IProsumerRepository
     {
         // NIC is the _id, so this is a primary key lookup
         return await _prosumers.Find(p => p.Nic == nic).FirstOrDefaultAsync();
+    }
+
+    /// <summary>
+    /// Finds a single prosumer by email address.
+    /// </summary>
+    public async Task<Prosumer?> GetByEmailAsync(string email)
+    {
+        // Emails are saved in lowercase, so the caller passes a lowercase value
+        return await _prosumers.Find(p => p.Email == email).FirstOrDefaultAsync();
     }
 
     /// <summary>

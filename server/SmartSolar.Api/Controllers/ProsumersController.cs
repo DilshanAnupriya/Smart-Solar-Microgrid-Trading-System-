@@ -129,7 +129,7 @@ public class ProsumersController : ControllerBase
     /// </summary>
     private (string CallerId, string CallerRole) GetCaller()
     {
-        // CHECK with Nadeema: id must be in NameIdentifier and role in the Role claim
+        // Prosumer tokens (TokenService) put the NIC in NameIdentifier and "Prosumer" in Role
         var callerId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
         var callerRole = User.FindFirstValue(ClaimTypes.Role) ?? string.Empty;
         return (callerId, callerRole);

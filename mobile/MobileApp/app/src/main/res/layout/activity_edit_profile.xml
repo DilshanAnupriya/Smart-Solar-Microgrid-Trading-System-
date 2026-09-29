@@ -112,6 +112,15 @@
                 android:minLines="3"
                 android:paddingVertical="12dp" />
 
+            <!-- The API's reason when the changes can't be saved -->
+            <TextView
+                android:id="@+id/tvFormError"
+                style="@style/Banner"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_banner_danger"
+                android:textColor="@color/danger_text"
+                android:visibility="gone" />
+
             <Button
                 android:id="@+id/btnSave"
                 android:layout_width="match_parent"

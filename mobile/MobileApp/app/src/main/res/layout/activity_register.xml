@@ -193,6 +193,15 @@
                 android:imeOptions="actionDone"
                 android:inputType="textPassword" />
 
+            <!-- The API's reason when registration fails, e.g. the NIC is already registered -->
+            <TextView
+                android:id="@+id/tvFormError"
+                style="@style/Banner"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_banner_danger"
+                android:textColor="@color/danger_text"
+                android:visibility="gone" />
+
             <Button
                 android:id="@+id/btnRegister"
                 android:layout_width="match_parent"
