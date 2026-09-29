@@ -67,3 +67,21 @@ export const REFERENCE_NODES = [
   { id: 'NODE-JAFFNA-03', name: 'Jaffna Northern Solar Park (200 kWh)', capacity: 200, slots: 12 },
 ];
 
+// Prosumer account status, spelled exactly as the API's ProsumerStatus enum
+// serialises it. The API rejects anything other than these two words.
+export const PROSUMER_STATUS = {
+  ACTIVE: 'Active',
+  DEACTIVATED: 'Deactivated',
+};
+
+// Used to build the status filter on the prosumer list page
+export const PROSUMER_STATUS_OPTIONS = [
+  { value: PROSUMER_STATUS.ACTIVE, label: 'Active' },
+  { value: PROSUMER_STATUS.DEACTIVATED, label: 'Deactivated' },
+];
+
+// Microgrid nodes use soft deletion, represented by the boolean isActive field
+export const NODE_STATUS = {
+  ACTIVE: 'Active',
+  INACTIVE: 'Inactive',
+};

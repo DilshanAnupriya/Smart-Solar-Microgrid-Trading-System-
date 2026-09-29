@@ -23,4 +23,5 @@ public abstract class AppException : Exception
         // Store the status code for the exception handling middleware
         StatusCode = statusCode;
     }
+
 }

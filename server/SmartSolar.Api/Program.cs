@@ -8,6 +8,8 @@
  *              authentication, role based authorization, CORS for the React
  *              client, dependency injection for the user management services,
  *              global exception handling and first-run database seeding.
+ * Modified:    2026-09-21 by BDA Cooray (IT22189530) — registered the
+ *              prosumer management repository and service.
  * Description: Application entry point. Registers configuration, the MongoDB
  *              context, security services and controllers, and builds the HTTP
  *              request pipeline.
@@ -60,9 +62,19 @@ builder.Services.AddScoped<IWebUserRepository, WebUserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+// Prosumer management: data access and business rules
+builder.Services.AddScoped<IProsumerRepository, ProsumerRepository>();
+builder.Services.AddScoped<IProsumerService, ProsumerService>();
+
+// Microgrid node management: data access, reservation guard and business rules
+builder.Services.AddScoped<INodeRepository, NodeRepository>();
+builder.Services.AddScoped<INodeReservationChecker, NodeReservationChecker>();
+builder.Services.AddScoped<INodeService, NodeService>();
+
 // Data access and business logic for energy slot reservation management
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
+
 
 // Runs once at start-up to create indexes and seed the first Backoffice user
 builder.Services.AddScoped<DatabaseSeeder>();

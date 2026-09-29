@@ -21,6 +21,7 @@ public class DatabaseSeeder
 {
     private readonly IWebUserRepository _repository;
     private readonly IReservationRepository _reservationRepository;
+    private readonly INodeRepository _nodeRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly SeedAdminSettings _settings;
     private readonly ILogger<DatabaseSeeder> _logger;
@@ -31,6 +32,7 @@ public class DatabaseSeeder
     public DatabaseSeeder(
         IWebUserRepository repository,
         IReservationRepository reservationRepository,
+        INodeRepository nodeRepository,
         IPasswordHasher passwordHasher,
         IOptions<SeedAdminSettings> options,
         ILogger<DatabaseSeeder> logger)
@@ -38,6 +40,7 @@ public class DatabaseSeeder
         // Store everything the seeding routine needs
         _repository = repository;
         _reservationRepository = reservationRepository;
+        _nodeRepository = nodeRepository;
         _passwordHasher = passwordHasher;
         _settings = options.Value;
         _logger = logger;
@@ -50,6 +53,7 @@ public class DatabaseSeeder
     {
         // Indexes are created first so all documents are protected by them
         await _repository.EnsureIndexesAsync();
+        await _nodeRepository.EnsureIndexesAsync();
         await _reservationRepository.EnsureIndexesAsync();
 
         await SeedReservationsAsync();

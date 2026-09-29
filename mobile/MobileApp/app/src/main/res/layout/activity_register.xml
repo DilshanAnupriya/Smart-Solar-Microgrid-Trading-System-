@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The FrameLayout takes the system-bar and keyboard insets as padding, so the ScrollView
+     itself shrinks when the keyboard opens and scrolls the focused field into view -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:paddingBottom="24dp">
+
+            <!-- Back to the sign-in screen -->
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="-12dp"
+                android:layout_marginTop="8dp"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/register_back"
+                android:src="@drawable/ic_arrow_back" />
+
+            <!-- Header: logo, title and subtitle, centred like the login screen -->
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/bg_logo"
+                android:contentDescription="@string/login_logo_description"
+                android:padding="12dp"
+                android:src="@drawable/ic_sun" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:text="@string/register_title"
+                android:textColor="@color/text_dark"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:text="@string/register_subtitle"
+                android:textColor="@color/text_muted"
+                android:textSize="15sp" />
+
+            <!-- NIC: the prosumer's primary key -->
+            <TextView
+                style="@style/FormLabel"
+                android:layout_marginTop="28dp"
+                android:text="@string/register_nic_label" />
+
+            <!-- Format (9 digits + V/X, or 12 digits) is checked by ProsumerValidator on submit.
+                 Don't use android:digits here: it makes the field multi-line, so Next stops working. -->
+            <EditText
+                android:id="@+id/etNic"
+                style="@style/FormInput"
+                android:hint="@string/register_nic_hint"
+                android:importantForAutofill="no"
+                android:inputType="textCapCharacters|textNoSuggestions"
+                android:maxLength="12" />
+
+            <TextView
+                style="@style/FormHelper"
+                android:text="@string/register_nic_helper" />
+
+            <!-- Full name -->
+            <TextView
+                style="@style/FormLabel"
+                android:text="@string/register_full_name_label" />
+
+            <EditText
+                android:id="@+id/etFullName"
+                style="@style/FormInput"
+                android:autofillHints="name"
+                android:hint="@string/register_full_name_hint"
+                android:inputType="textPersonName|textCapWords"
+                android:maxLength="100" />
+
+            <!-- Email -->
+            <TextView
+                style="@style/FormLabel"
+                android:text="@string/register_email_label" />
+
+            <EditText
+                android:id="@+id/etEmail"
+                style="@style/FormInput"
+                android:autofillHints="emailAddress"
+                android:hint="@string/register_email_hint"
+                android:inputType="textEmailAddress" />
+
+            <!-- Phone -->
+            <TextView
+                style="@style/FormLabel"
+                android:text="@string/register_phone_label" />
+
+            <EditText
+                android:id="@+id/etPhone"
+                style="@style/FormInput"
+                android:autofillHints="phone"
+                android:hint="@string/register_phone_hint"
+                android:inputType="phone"
+                android:maxLength="10" />
+
+            <!-- Address: multi-line, so it grows instead of using the fixed 48dp input height -->
+            <TextView
+                style="@style/FormLabel"
+                android:text="@string/register_address_label" />
+
+            <EditText
+                android:id="@+id/etAddress"
+                style="@style/FormInput"
+                android:layout_height="wrap_content"
+                android:autofillHints="postalAddress"
+                android:gravity="top|start"
+                android:hint="@string/register_address_hint"
+                android:inputType="textPostalAddress|textMultiLine|textCapWords"
+                android:maxLength="250"
+                android:minLines="3"
+                android:paddingVertical="12dp" />
+
+            <!-- Password, with a Show/Hide button that applies to both password fields -->
+            <TextView
+                style="@style/FormLabel"
+                android:text="@string/register_password_label" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/etPassword"
+                    style="@style/FormInput"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="0dp"
+                    android:layout_weight="1"
+                    android:autofillHints="newPassword"
+                    android:background="@drawable/bg_input_left"
+                    android:fontFamily="sans-serif"
+                    android:hint="@string/register_password_hint"
+                    android:inputType="textPassword" />
+
+                <!-- -1dp margin overlaps the two 1dp borders so the seam is a single line -->
+                <Button
+                    android:id="@+id/btnTogglePassword"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="-1dp"
+                    android:background="@drawable/bg_btn_outline"
+                    android:minWidth="72dp"
+                    android:minHeight="0dp"
+                    android:paddingHorizontal="16dp"
+                    android:stateListAnimator="@null"
+                    android:text="@string/login_show_password"
+                    android:textAllCaps="false"
+                    android:textColor="@color/btn_outline_text"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <TextView
+                style="@style/FormHelper"
+                android:text="@string/register_password_helper" />
+
+            <!-- Confirm password -->
+            <TextView
+                style="@style/FormLabel"
+                android:text="@string/register_confirm_password_label" />
+
+            <EditText
+                android:id="@+id/etConfirmPassword"
+                style="@style/FormInput"
+                android:autofillHints="newPassword"
+                android:fontFamily="sans-serif"
+                android:hint="@string/register_confirm_password_hint"
+                android:imeOptions="actionDone"
+                android:inputType="textPassword" />
+
+            <Button
+                android:id="@+id/btnRegister"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="28dp"
+                android:background="@drawable/bg_btn_primary"
+                android:stateListAnimator="@null"
+                android:text="@string/register_submit"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="17sp" />
+
+            <!-- Back to sign in -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/register_have_account"
+                    android:textColor="@color/text_muted"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/tvGoToLogin"
+                    style="@style/TextLink"
+                    android:text="@string/register_go_to_login" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

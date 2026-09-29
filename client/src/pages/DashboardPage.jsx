@@ -96,9 +96,11 @@ export default function DashboardPage() {
                 <div className="card-body">
                   <h2 className="h6 fw-semibold mb-3">Quick actions</h2>
                   <div className="d-flex flex-wrap gap-2">
-                    <Link to="/reservations" className="btn btn-primary btn-sm">Manage reservations</Link>
+                    <Link to="/users/new" className="btn btn-primary btn-sm">Add a user</Link>
+                    <Link to="/nodes/new" className="btn btn-primary btn-sm">Add a node</Link>
+                    <Link to="/reservations" className="btn btn-outline-primary btn-sm">Manage reservations</Link>
                     <Link to="/reservations/new" className="btn btn-outline-primary btn-sm">+ New booking</Link>
-                    <Link to="/users/new" className="btn btn-outline-secondary btn-sm">Add a user</Link>
+                    <Link to="/nodes" className="btn btn-outline-secondary btn-sm">Manage nodes</Link>
                     <Link to="/users" className="btn btn-outline-secondary btn-sm">Manage users</Link>
                     <Link to="/profile" className="btn btn-outline-secondary btn-sm">My profile</Link>
                   </div>

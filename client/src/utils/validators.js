@@ -139,3 +139,67 @@ export function validateChangePasswordForm(values) {
 
   return errors;
 }
+
+// The prosumer API accepts only a local 10 digit number starting with 0, so
+// the +94 form allowed for web users is deliberately not permitted here
+const PROSUMER_PHONE_PATTERN = /^0\d{9}$/;
+
+/**
+ * Validates the create/edit prosumer form and returns an errors object. These
+ * rules mirror ProsumerCreateRequest, ProsumerUpdateRequest and NicValidator on
+ * the API, which stay the single place where they are actually enforced.
+ */
+export function validateProsumerForm(values, { requireNic, requirePassword }) {
+  // An empty object means the form passed every check
+  const errors = {};
+
+  // The NIC is the primary key, so it is only asked for when creating
+  if (requireNic) {
+    if (!values.nic?.trim()) {
+      errors.nic = 'NIC number is required.';
+    } else if (!NIC_PATTERN.test(values.nic.trim())) {
+      errors.nic = 'Enter 9 digits followed by V or X, or 12 digits.';
+    }
+  }
+
+  if (!values.fullName?.trim()) {
+    errors.fullName = 'Full name is required.';
+  } else if (values.fullName.trim().length < 3) {
+    errors.fullName = 'Full name must be at least 3 characters.';
+  } else if (values.fullName.trim().length > 100) {
+    errors.fullName = 'Full name must be 100 characters or fewer.';
+  }
+
+  if (!values.email?.trim()) {
+    errors.email = 'Email is required.';
+  } else if (!EMAIL_PATTERN.test(values.email.trim())) {
+    errors.email = 'Enter a valid email address.';
+  }
+
+  if (!values.phone?.trim()) {
+    errors.phone = 'Phone number is required.';
+  } else if (!PROSUMER_PHONE_PATTERN.test(values.phone.trim())) {
+    errors.phone = 'Phone number must be 10 digits starting with 0.';
+  }
+
+  if (!values.address?.trim()) {
+    errors.address = 'Address is required.';
+  } else if (values.address.trim().length > 250) {
+    errors.address = 'Address must be 250 characters or fewer.';
+  }
+
+  // The password is set once, when the account is created
+  if (requirePassword) {
+    if (!values.password) {
+      errors.password = 'Password is required.';
+    } else if (values.password.length < 8) {
+      errors.password = 'Password must be at least 8 characters.';
+    }
+
+    if (values.password !== values.confirmPassword) {
+      errors.confirmPassword = 'Passwords do not match.';
+    }
+  }
+
+  return errors;
+}

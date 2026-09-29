@@ -56,11 +56,7 @@ export default function OperationsHomePage() {
               <p className="text-secondary small mb-3">
                 Battery slot availability, hub schedules, and capacity telemetry.
               </p>
-              <div className="d-flex gap-2">
-                <button type="button" className="btn btn-outline-secondary btn-sm" disabled>
-                  Hub Schedules
-                </button>
-              </div>
+              <Link to="/nodes" className="btn btn-primary btn-sm mt-3">Manage node slots</Link>
             </div>
           </div>
         </div>
