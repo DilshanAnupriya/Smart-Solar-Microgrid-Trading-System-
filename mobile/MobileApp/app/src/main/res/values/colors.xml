@@ -16,4 +16,12 @@
     <color name="border_focus">#FF86B7FE</color>
     <color name="primary">#FF0D6EFD</color>
     <color name="primary_pressed">#FF0B5ED7</color>
+    <color name="page_background">#FFF8F9FA</color>
+    <color name="input_disabled">#FFE9ECEF</color>
+    <color name="danger">#FFDC3545</color>
+    <color name="danger_border">#FFF1AEB5</color>
+    <color name="success_background">#FFD1E7DD</color>
+    <color name="success_text">#FF0F5132</color>
+    <color name="danger_background">#FFF8D7DA</color>
+    <color name="danger_text">#FF842029</color>
 </resources>

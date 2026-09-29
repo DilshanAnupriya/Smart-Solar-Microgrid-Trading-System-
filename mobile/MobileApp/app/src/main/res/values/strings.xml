@@ -14,7 +14,6 @@
     <string name="login_logo_description">Smart Solar Microgrid logo</string>
     <string name="login_error_identifier_required">Enter your email, username or phone number</string>
     <string name="login_error_password_required">Enter your password</string>
-    <string name="login_not_connected">Sign-in is not connected to the server yet</string>
     <string name="login_no_account">Don\'t have an account?</string>
     <string name="login_go_to_register">Register</string>
 
@@ -42,6 +41,37 @@
     <string name="register_have_account">Already have an account?</string>
     <string name="register_go_to_login">Sign in</string>
     <string name="register_not_connected">Registration is not connected to the server yet</string>
+
+    <!-- Profile screen -->
+    <string name="profile_title">My profile</string>
+    <string name="profile_edit">Edit</string>
+    <string name="profile_deactivate">Deactivate</string>
+    <string name="profile_nic_subtitle">NIC %1$s</string>
+    <string name="profile_status_active">Active</string>
+    <string name="profile_status_deactivated">Deactivated</string>
+    <string name="profile_deactivated_banner">Your account is deactivated. You can\'t sign in or trade energy until a Backoffice officer reactivates it.</string>
+    <string name="profile_details_heading">Personal details</string>
+    <string name="profile_nic_label">NIC number</string>
+    <string name="profile_nic_locked">Your account ID. It can\'t be changed.</string>
+    <string name="profile_email_label">Email</string>
+    <string name="profile_phone_label">Phone number</string>
+    <string name="profile_address_label">Address</string>
+    <string name="profile_member_since_label">Member since</string>
+    <string name="profile_updated">Profile updated (not saved to the server yet)</string>
+
+    <!-- Deactivate confirmation -->
+    <string name="deactivate_title">Deactivate your account?</string>
+    <string name="deactivate_message">You won\'t be able to sign in or trade energy after this. Only a Backoffice officer can reactivate your account.</string>
+    <string name="deactivate_confirm">Deactivate</string>
+    <string name="deactivate_cancel">Cancel</string>
+    <string name="deactivate_not_connected">Deactivation is not connected to the server yet</string>
+
+    <!-- Edit profile screen -->
+    <string name="edit_profile_title">Edit profile</string>
+    <string name="edit_profile_back">Back to profile</string>
+    <string name="edit_profile_nic_helper">Your NIC is your account ID and can\'t be changed.</string>
+    <string name="edit_profile_save">Save changes</string>
+    <string name="edit_profile_cancel">Cancel</string>
 
     <!-- Prosumer form errors (same wording as the web client) -->
     <string name="error_nic_required">NIC number is required.</string>

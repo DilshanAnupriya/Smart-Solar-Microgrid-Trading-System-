@@ -63,6 +63,7 @@
                 android:hint="@string/login_identifier_hint"
                 android:imeOptions="actionNext"
                 android:inputType="textEmailAddress"
+                android:nextFocusDown="@id/etPassword"
                 android:paddingHorizontal="12dp"
                 android:textColor="@color/text_dark"
                 android:textColorHint="@color/text_muted"
