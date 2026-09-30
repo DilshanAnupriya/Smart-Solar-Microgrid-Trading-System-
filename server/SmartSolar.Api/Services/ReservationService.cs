@@ -102,7 +102,7 @@ public class ReservationService : IReservationService
             SlotEndTime = endUtc,
             EnergyAmountKWh = dto.EnergyAmountKWh,
             ReservationType = dto.ReservationType.Trim(),
-            Status = ReservationStatus.Approved, // Auto-approved on creation or pending confirmation
+            Status = ReservationStatus.Pending, // Initial state awaiting grid operator approval
             TransactionQrCode = qrData,
             Notes = dto.Notes?.Trim(),
             CreatedAt = now,
