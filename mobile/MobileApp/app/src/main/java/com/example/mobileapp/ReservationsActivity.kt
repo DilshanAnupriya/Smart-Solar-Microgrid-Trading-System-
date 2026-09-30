@@ -1,17 +1,21 @@
 package com.example.mobileapp
 
-import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.example.mobileapp.network.ApiResult
+import com.example.mobileapp.network.ReservationApi
+import com.example.mobileapp.sessions.SessionManager
+import com.example.mobileapp.utils.BaseActivity
+import kotlinx.coroutines.launch
 
 /**
  * "My reservations": the prosumer's reservations, upcoming first, with a New button.
  */
-class ReservationsActivity : Activity() {
+class ReservationsActivity : BaseActivity() {
 
     private lateinit var listContainer: LinearLayout
     private lateinit var tvEmpty: TextView
@@ -31,8 +35,23 @@ class ReservationsActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
-        // Rebuild every time, so changes made on other screens show up on return
+        // Rebuild immediately from cache, then fetch live data from server
         showReservations()
+        fetchLiveReservations()
+    }
+
+    private fun fetchLiveReservations() {
+        val currentUser = SessionManager(this).getCurrentUser()
+        val nic = currentUser?.nic
+        uiScope.launch {
+            val api = ReservationApi(this@ReservationsActivity)
+            val result = api.getAll(nic = nic)
+            if (result is ApiResult.Success) {
+                val mapped = result.data.map { ReservationStore.fromApiReservation(it) }
+                ReservationStore.setReservations(mapped)
+                showReservations()
+            }
+        }
     }
 
     private fun showReservations() {

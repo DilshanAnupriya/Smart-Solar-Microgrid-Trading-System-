@@ -1,30 +1,116 @@
 package com.example.mobileapp
 
+import com.example.mobileapp.models.ApiReservation
+import com.example.mobileapp.models.MicrogridStation
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
+import java.util.TimeZone
 import java.util.UUID
 
 /**
- * Temporary in-memory reservations so the screens can be used before the reservation
- * API exists. Everything resets when the app process restarts.
- *
- * Replace these calls with the API (and SQLite caching) when the backend is ready:
- *   create -> POST /api/reservations, update -> PUT /api/reservations/{id},
- *   cancel -> PATCH /api/reservations/{id}/cancel, all() -> GET /api/reservations?nic=...
+ * In-memory reservation store for prosumer UI state.
+ * Synchronized with the SmartSolar MongoDB backend via ReservationApi.
  */
 object ReservationStore {
 
-    val nodes = listOf(
-        GridNode("NODE-001", "Colombo South Solar Hub", "Galle Road, Colombo 03"),
-        GridNode("NODE-002", "Kandy Hills Microgrid", "Peradeniya Road, Kandy"),
-        GridNode("NODE-003", "Negombo Coastal Node", "Lewis Place, Negombo")
+    val defaultNodes = listOf(
+        GridNode("NODE-COLOMBO-01", "Colombo Central Hub (120 kWh)", "Galle Road, Colombo 03, Western Province"),
+        GridNode("NODE-KANDY-02", "Kandy Hillcrest Station (80 kWh)", "Peradeniya Road, Kandy, Central Province"),
+        GridNode("NODE-GALLE-01", "Galle Coastal Solar Grid (150 kWh)", "Matara Road, Galle, Southern Province")
     )
 
-    // Filled on first use, with times relative to "now" so every status and rule can be seen
+    var nodes: List<GridNode> = defaultNodes
+
+    fun updateNodesFromStations(stations: List<MicrogridStation>) {
+        if (stations.isEmpty()) return
+        nodes = stations.map {
+            GridNode(it.nodeCode.ifBlank { it.id }, it.name, it.address)
+        }
+    }
+
+    // Filled on first use with seed/cache
     private val reservations: MutableList<Reservation> by lazy { createSampleReservations() }
 
-    fun all(): List<Reservation> = reservations.toList()
+    fun all(): List<Reservation> = synchronized(reservations) { reservations.toList() }
 
-    fun find(id: String): Reservation? = reservations.firstOrNull { it.id == id }
+    fun find(id: String): Reservation? = synchronized(reservations) {
+        val clean = id.trim()
+        reservations.firstOrNull { it.id.equals(clean, ignoreCase = true) }
+    }
+
+    fun addOrUpdate(reservation: Reservation) = synchronized(reservations) {
+        val index = reservations.indexOfFirst { it.id.equals(reservation.id, ignoreCase = true) }
+        if (index != -1) {
+            reservations[index] = reservation
+        } else {
+            reservations.add(0, reservation)
+        }
+    }
+
+    fun setReservations(list: List<Reservation>) = synchronized(reservations) {
+        reservations.clear()
+        reservations.addAll(list)
+    }
+
+    /**
+     * Converts an API response DTO from MongoDB into the local domain model.
+     */
+    fun fromApiReservation(api: ApiReservation): Reservation {
+        val startMillis = parseIsoToMillis(api.slotStartTime)
+        val endMillis = parseIsoToMillis(api.slotEndTime)
+        val durationHours = (((endMillis - startMillis) / (1000 * 60 * 60)).toInt()).coerceIn(1, 12)
+
+        val node = nodes.firstOrNull { it.id.equals(api.nodeId, ignoreCase = true) }
+            ?: GridNode(
+                id = api.nodeId,
+                name = api.nodeName.ifBlank { "Grid Node ${api.nodeId}" },
+                location = ""
+            )
+
+        val type = if (api.isCharging) ReservationType.CHARGING else ReservationType.DROP_OFF
+
+        val status = when (api.status.lowercase(Locale.ROOT)) {
+            "approved" -> ReservationStatus.APPROVED
+            "completed" -> ReservationStatus.COMPLETED
+            "cancelled" -> ReservationStatus.CANCELLED
+            else -> ReservationStatus.PENDING
+        }
+
+        val displayId = if (api.reservationNumber.isNotBlank()) api.reservationNumber else api.id
+
+        return Reservation(
+            id = displayId,
+            node = node,
+            type = type,
+            startMillis = startMillis,
+            durationHours = durationHours,
+            energyKwh = api.energyAmountKWh,
+            status = status,
+            qrToken = api.transactionQrCode.ifBlank { null }
+        )
+    }
+
+    fun parseIsoToMillis(isoString: String): Long {
+        if (isoString.isBlank()) return System.currentTimeMillis()
+        val patterns = listOf(
+            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+            "yyyy-MM-dd'T'HH:mm:ss'Z'",
+            "yyyy-MM-dd'T'HH:mm:ss.SSS",
+            "yyyy-MM-dd'T'HH:mm:ss",
+            "yyyy-MM-dd'T'HH:mm"
+        )
+        for (pattern in patterns) {
+            try {
+                val sdf = SimpleDateFormat(pattern, Locale.US).apply {
+                    timeZone = TimeZone.getTimeZone("UTC")
+                }
+                val date = sdf.parse(isoString)
+                if (date != null) return date.time
+            } catch (_: Exception) {}
+        }
+        return System.currentTimeMillis()
+    }
 
     /** New requests start as Pending until a grid operator approves them. */
     fun create(
@@ -44,7 +130,7 @@ object ReservationStore {
             status = ReservationStatus.PENDING,
             qrToken = null
         )
-        reservations.add(reservation)
+        addOrUpdate(reservation)
         return reservation
     }
 
@@ -71,8 +157,8 @@ object ReservationStore {
     fun cancel(id: String): Reservation? =
         replace(id) { it.copy(status = ReservationStatus.CANCELLED, qrToken = null) }
 
-    private fun replace(id: String, change: (Reservation) -> Reservation): Reservation? {
-        val index = reservations.indexOfFirst { it.id == id }
+    private fun replace(id: String, change: (Reservation) -> Reservation): Reservation? = synchronized(reservations) {
+        val index = reservations.indexOfFirst { it.id.equals(id, ignoreCase = true) }
         if (index == -1) return null
 
         val updated = change(reservations[index])
@@ -92,25 +178,17 @@ object ReservationStore {
 
         return mutableListOf(
             Reservation(
-                "RSV-1001", nodes[0], ReservationType.DROP_OFF, atHour(daysFromToday = 2, hour = 10),
+                "RES-SAMPLE-01", nodes[0], ReservationType.DROP_OFF, atHour(daysFromToday = 2, hour = 10),
                 2, 12.5, ReservationStatus.APPROVED, sampleToken()
             ),
             Reservation(
-                "RSV-1002", nodes[1], ReservationType.CHARGING, atHour(daysFromToday = 4, hour = 14),
+                "RES-SAMPLE-02", nodes[1], ReservationType.CHARGING, atHour(daysFromToday = 4, hour = 14),
                 1, 8.0, ReservationStatus.PENDING, null
             ),
             // Starts in about 6 hours, so the 12-hour rule locks it
             Reservation(
-                "RSV-1003", nodes[2], ReservationType.CHARGING, hoursFromNow(6),
+                "RES-SAMPLE-03", nodes[2], ReservationType.CHARGING, hoursFromNow(6),
                 1, 5.0, ReservationStatus.APPROVED, sampleToken()
-            ),
-            Reservation(
-                "RSV-0998", nodes[0], ReservationType.DROP_OFF, atHour(daysFromToday = -3, hour = 9),
-                3, 20.0, ReservationStatus.COMPLETED, null
-            ),
-            Reservation(
-                "RSV-0999", nodes[1], ReservationType.CHARGING, atHour(daysFromToday = -1, hour = 16),
-                2, 10.0, ReservationStatus.CANCELLED, null
             )
         )
     }

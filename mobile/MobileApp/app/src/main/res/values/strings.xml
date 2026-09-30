@@ -130,6 +130,7 @@
     <string name="reservation_energy_helper">Between 1 and 100 kWh.</string>
     <string name="reservation_submit_new">Request reservation</string>
     <string name="reservation_submit_modify">Save changes</string>
+    <string name="reservation_submitting">Submitting…</string>
 
     <!-- Reservation detail -->
     <string name="reservation_detail_title">Reservation</string>

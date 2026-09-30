@@ -85,6 +85,91 @@ class ReservationApi(context: Context) {
     }
 
     /**
+     * Creates a new power trading reservation via POST /reservations.
+     * Caches the created reservation in SQLite.
+     */
+    suspend fun createReservation(
+        nodeId: String,
+        nodeName: String,
+        slotStartTimeUtc: String,
+        slotEndTimeUtc: String,
+        energyAmountKWh: Double,
+        reservationType: String,
+        prosumerNic: String? = null,
+        prosumerName: String? = null,
+        notes: String? = null
+    ): ApiResult<ApiReservation> {
+        val body = JSONObject().apply {
+            put("nodeId", nodeId)
+            put("nodeName", nodeName)
+            put("slotStartTime", slotStartTimeUtc)
+            put("slotEndTime", slotEndTimeUtc)
+            put("energyAmountKWh", energyAmountKWh)
+            put("reservationType", reservationType)
+            if (!prosumerNic.isNullOrBlank()) put("prosumerNic", prosumerNic)
+            if (!prosumerName.isNullOrBlank()) put("prosumerName", prosumerName)
+            if (!notes.isNullOrBlank()) put("notes", notes)
+        }
+
+        val result = client.post("/reservations", body)
+        return when (result) {
+            is ApiResult.Success -> {
+                val created = ApiReservation.fromJson(result.data)
+                reservationDao.insertOrReplace(created)
+                ApiResult.Success(created, result.message)
+            }
+            is ApiResult.Failure -> result
+        }
+    }
+
+    /**
+     * Updates an existing reservation slot time and energy amount via PUT /reservations/{id}.
+     */
+    suspend fun updateReservation(
+        id: String,
+        slotStartTimeUtc: String,
+        slotEndTimeUtc: String,
+        energyAmountKWh: Double,
+        notes: String? = null
+    ): ApiResult<ApiReservation> {
+        val body = JSONObject().apply {
+            put("slotStartTime", slotStartTimeUtc)
+            put("slotEndTime", slotEndTimeUtc)
+            put("energyAmountKWh", energyAmountKWh)
+            if (!notes.isNullOrBlank()) put("notes", notes)
+        }
+
+        val result = client.put("/reservations/" + Uri.encode(id), body)
+        return when (result) {
+            is ApiResult.Success -> {
+                val updated = ApiReservation.fromJson(result.data)
+                reservationDao.insertOrReplace(updated)
+                ApiResult.Success(updated, result.message)
+            }
+            is ApiResult.Failure -> result
+        }
+    }
+
+    /**
+     * Cancels an existing reservation via PATCH /reservations/{id}/cancel.
+     */
+    suspend fun cancelReservation(id: String, reason: String = "Cancelled by user via mobile app"): ApiResult<ApiReservation> {
+        val body = JSONObject().apply {
+            put("reason", reason)
+        }
+
+        val result = client.patch("/reservations/" + Uri.encode(id) + "/cancel", body)
+        return when (result) {
+            is ApiResult.Success -> {
+                val cancelled = ApiReservation.fromJson(result.data)
+                reservationDao.insertOrReplace(cancelled)
+                ApiResult.Success(cancelled, result.message)
+            }
+            is ApiResult.Failure -> result
+        }
+    }
+
+    /**
      * Retrieves aggregated counts for the Grid Operator operational dashboard.
      */
     suspend fun getStats(): ApiResult<ReservationStats> {
