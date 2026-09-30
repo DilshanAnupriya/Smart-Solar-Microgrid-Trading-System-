@@ -73,11 +73,12 @@ class ProsumerApi(context: Context) {
     }
 
     /**
-     * PATCH /prosumers/{nic}/deactivate. Afterwards the API refuses to sign this prosumer in
-     * until a Backoffice officer reactivates the account.
+     * PATCH /prosumers/{nic}/deactivate. For a prosumer this only sends a deactivation request:
+     * the account is blocked (the API refuses to sign it in) until a Backoffice officer
+     * approves or rejects the request from the web app.
      */
     suspend fun deactivate(nic: String): ApiResult<Prosumer> {
-        // The reply is the profile with its new "Deactivated" status
+        // The reply is the profile with its new "PendingDeactivation" status
         return client.patch(profilePath(nic) + "/deactivate").map { parseProsumer(it.getJSONObject("data")) }
     }
 

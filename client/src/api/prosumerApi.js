@@ -87,6 +87,28 @@ export async function deactivateProsumer(nic) {
 }
 
 /**
+ * PATCH api/prosumers/{nic}/deactivation/approve — approves a prosumer's
+ * deactivation request, so the account becomes Deactivated.
+ */
+export async function approveDeactivationRequest(nic) {
+  // Backoffice only; the API refuses it when no request is pending
+  const response = await axiosClient.patch(`/prosumers/${encodeURIComponent(nic)}/deactivation/approve`);
+
+  return unwrap(response);
+}
+
+/**
+ * PATCH api/prosumers/{nic}/deactivation/reject — rejects a prosumer's
+ * deactivation request, so the account becomes Active again.
+ */
+export async function rejectDeactivationRequest(nic) {
+  // Backoffice only; the API refuses it when no request is pending
+  const response = await axiosClient.patch(`/prosumers/${encodeURIComponent(nic)}/deactivation/reject`);
+
+  return unwrap(response);
+}
+
+/**
  * PATCH api/prosumers/{nic}/reactivate — restores a deactivated account.
  */
 export async function reactivateProsumer(nic) {

@@ -31,6 +31,10 @@ data class Prosumer(
     val isActive: Boolean
         get() = status == STATUS_ACTIVE
 
+    /** True while a deactivation request waits for Backoffice; the account is blocked meanwhile. */
+    val isPendingDeactivation: Boolean
+        get() = status == STATUS_PENDING_DEACTIVATION
+
     /**
      * Up to two initials for the profile avatar, e.g. "Nimal Perera" -> "NP".
      */
@@ -62,6 +66,7 @@ data class Prosumer(
     companion object {
         // Same values as the API's ProsumerStatus enum
         const val STATUS_ACTIVE = "Active"
+        const val STATUS_PENDING_DEACTIVATION = "PendingDeactivation"
         const val STATUS_DEACTIVATED = "Deactivated"
 
         private const val KEY_NIC = "prosumer_nic"

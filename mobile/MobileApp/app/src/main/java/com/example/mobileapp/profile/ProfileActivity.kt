@@ -183,17 +183,25 @@ class ProfileActivity : BaseActivity() {
             tvStatus.setBackgroundResource(R.drawable.bg_badge_active)
             tvStatus.setTextColor(getColor(R.color.success_text))
         } else {
-            tvStatus.setText(R.string.profile_status_deactivated)
+            tvStatus.setText(
+                if (prosumer.isPendingDeactivation) R.string.profile_status_pending_deactivation
+                else R.string.profile_status_deactivated
+            )
             tvStatus.setBackgroundResource(R.drawable.bg_badge_deactivated)
             tvStatus.setTextColor(getColor(R.color.danger_text))
         }
 
-        // A deactivated prosumer can't change their profile, so hide both actions and explain why
+        // A blocked prosumer (pending request or deactivated) can't change their profile,
+        // so hide both actions and explain why
         val actionsVisibility = if (prosumer.isActive) View.VISIBLE else View.GONE
         btnEdit.visibility = actionsVisibility
         btnDeactivate.visibility = actionsVisibility
-        // A deactivated account can't trade energy, so it can't reach reservations either
+        // A blocked account can't trade energy, so it can't reach reservations either
         cardReservations.visibility = actionsVisibility
+        tvDeactivatedBanner.setText(
+            if (prosumer.isPendingDeactivation) R.string.profile_pending_deactivation_banner
+            else R.string.profile_deactivated_banner
+        )
         tvDeactivatedBanner.visibility = if (prosumer.isActive) View.GONE else View.VISIBLE
     }
 
@@ -207,10 +215,10 @@ class ProfileActivity : BaseActivity() {
     }
 
     /**
-     * Asks for confirmation before deactivating the account.
+     * Asks for confirmation before sending the deactivation request.
      */
     private fun confirmDeactivation() {
-        // Deactivation can only be undone by a Backoffice officer, so make sure it's intended
+        // The account is blocked as soon as the request is sent, so make sure it's intended
         val dialog = AlertDialog.Builder(this)
             .setTitle(R.string.deactivate_title)
             .setMessage(R.string.deactivate_message)
@@ -224,10 +232,11 @@ class ProfileActivity : BaseActivity() {
     }
 
     /**
-     * PATCH /prosumers/{nic}/deactivate, then clears SQLite and returns to the login screen.
+     * PATCH /prosumers/{nic}/deactivate sends the deactivation request to the Backoffice,
+     * then clears SQLite and returns to the login screen.
      */
     private fun deactivateAccount() {
-        // The API refuses to sign this account in from now on, so the session is ended here too
+        // The account is blocked until the request is reviewed, so the session is ended here too
         setLoading(true)
         uiScope.launch {
             when (val result = ProsumerApi(this@ProfileActivity).deactivate(prosumer.nic)) {

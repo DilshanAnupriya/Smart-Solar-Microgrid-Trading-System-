@@ -8,8 +8,9 @@
  *              a status filter. Both filters are applied by the Web API through
  *              GET /api/prosumers?search=&status= rather than in the browser,
  *              so the table always shows what the database actually holds. Each
- *              row links to the profile page, where the deactivate and
- *              reactivate actions live. The API answers this route only for the
+ *              row links to the profile page, where the deactivate, reactivate
+ *              and approve/reject deactivation request actions live. A banner
+ *              shows how many deactivation requests are waiting for review. The API answers this route only for the
  *              Backoffice and Grid Operator roles.
  */
 
@@ -21,7 +22,7 @@ import PageHeader from '../../components/PageHeader';
 import { ProsumerStatusBadge } from '../../components/Badges';
 import { useToast } from '../../toast/useToast';
 import { getProsumers } from '../../api/prosumerApi';
-import { PROSUMER_STATUS_OPTIONS } from '../../utils/constants';
+import { PROSUMER_STATUS, PROSUMER_STATUS_OPTIONS } from '../../utils/constants';
 import { formatDate } from '../../utils/formatters';
 
 export default function ProsumerListPage() {
@@ -35,16 +36,24 @@ export default function ProsumerListPage() {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('all');
 
+  // Deactivation requests from the mobile app waiting for a Backoffice decision
+  const [pendingCount, setPendingCount] = useState(0);
+
   /**
-   * Fetches the prosumer list using the current search term and status.
+   * Fetches the prosumer list using the current search term and status, plus
+   * the number of open deactivation requests.
    */
   const loadProsumers = useCallback(async () => {
     // Runs on first render and again whenever either filter changes
     setLoading(true);
 
     try {
-      const data = await getProsumers({ search, status });
+      const [data, pending] = await Promise.all([
+        getProsumers({ search, status }),
+        getProsumers({ status: PROSUMER_STATUS.PENDING_DEACTIVATION }),
+      ]);
       setProsumers(data);
+      setPendingCount(pending.length);
     } catch (fetchError) {
       showError(fetchError.message);
     } finally {
@@ -79,6 +88,22 @@ export default function ProsumerListPage() {
           </Link>
         }
       />
+
+      {/* Each request blocks a prosumer until someone approves or rejects it */}
+      {pendingCount > 0 && status !== PROSUMER_STATUS.PENDING_DEACTIVATION && (
+        <div className="alert alert-warning d-flex align-items-center justify-content-between gap-2" role="status">
+          <span>
+            {pendingCount} deactivation request{pendingCount === 1 ? ' is' : 's are'} waiting for review.
+          </span>
+          <button
+            type="button"
+            className="btn btn-sm btn-warning"
+            onClick={() => setStatus(PROSUMER_STATUS.PENDING_DEACTIVATION)}
+          >
+            Show requests
+          </button>
+        </div>
+      )}
 
       <div className="card border-0 shadow-sm">
         <div className="card-body">

@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartSolar.Api.Common;
 using SmartSolar.Api.DTOs.Prosumers;
+using SmartSolar.Api.Models;
 using SmartSolar.Api.Services;
 
 namespace SmartSolar.Api.Controllers;
@@ -67,7 +68,7 @@ public class ProsumersController : ControllerBase
     [Authorize(Roles = "Backoffice,GridOperator")]
     public async Task<IActionResult> GetAll([FromQuery] string? search, [FromQuery] string? status)
     {
-        // Search matches NIC, name, email or phone; status is Active or Deactivated
+        // Search matches NIC, name, email or phone; status is Active, PendingDeactivation or Deactivated
         var result = await _prosumerService.GetAllAsync(search, status);
         return Ok(ApiResponse<List<ProsumerResponse>>.Ok(result, $"{result.Count} prosumer(s) found."));
     }
@@ -99,16 +100,47 @@ public class ProsumersController : ControllerBase
     }
 
     /// <summary>
-    /// PATCH api/prosumers/{nic}/deactivate — deactivate an account (staff, or the prosumer themselves).
+    /// PATCH api/prosumers/{nic}/deactivate — staff deactivate an account straight away; a
+    /// prosumer calling it for themselves only sends a request, which blocks the account
+    /// until a Backoffice officer approves or rejects it.
     /// </summary>
     [HttpPatch("{nic}/deactivate")]
     [Authorize(Roles = "Backoffice,GridOperator,Prosumer")]
     public async Task<IActionResult> Deactivate(string nic)
     {
-        // Records who deactivated the account and when
+        // The service decides between a request and an immediate deactivation
         var (callerId, callerRole) = GetCaller();
         var result = await _prosumerService.DeactivateAsync(nic, callerId, callerRole);
-        return Ok(ApiResponse<ProsumerResponse>.Ok(result, "Prosumer account deactivated."));
+        var message = result.Status == nameof(ProsumerStatus.PendingDeactivation)
+            ? "Deactivation request sent. The account is blocked until a Backoffice officer reviews it."
+            : "Prosumer account deactivated.";
+        return Ok(ApiResponse<ProsumerResponse>.Ok(result, message));
+    }
+
+    /// <summary>
+    /// PATCH api/prosumers/{nic}/deactivation/approve — approve a deactivation request (Backoffice only).
+    /// </summary>
+    [HttpPatch("{nic}/deactivation/approve")]
+    [Authorize(Roles = "Backoffice")]
+    public async Task<IActionResult> ApproveDeactivation(string nic)
+    {
+        // Role is checked here and again in the service
+        var (callerId, callerRole) = GetCaller();
+        var result = await _prosumerService.ApproveDeactivationAsync(nic, callerId, callerRole);
+        return Ok(ApiResponse<ProsumerResponse>.Ok(result, "Deactivation request approved."));
+    }
+
+    /// <summary>
+    /// PATCH api/prosumers/{nic}/deactivation/reject — reject a deactivation request (Backoffice only).
+    /// </summary>
+    [HttpPatch("{nic}/deactivation/reject")]
+    [Authorize(Roles = "Backoffice")]
+    public async Task<IActionResult> RejectDeactivation(string nic)
+    {
+        // The account becomes Active again, so the prosumer can sign in
+        var (callerId, callerRole) = GetCaller();
+        var result = await _prosumerService.RejectDeactivationAsync(nic, callerId, callerRole);
+        return Ok(ApiResponse<ProsumerResponse>.Ok(result, "Deactivation request rejected. The account is active again."));
     }
 
     /// <summary>

@@ -43,7 +43,16 @@ export function StatusBadge({ isActive }) {
  * Shows whether a prosumer account is active or has been deactivated.
  */
 export function ProsumerStatusBadge({ status }) {
-  // The API sends the status as the text "Active" or "Deactivated"
+  // A blocked account waiting for a Backoffice decision gets its own amber pill
+  if (status === PROSUMER_STATUS.PENDING_DEACTIVATION) {
+    return (
+      <span className="badge rounded-pill border status-badge bg-warning-subtle text-warning-emphasis border-warning-subtle">
+        Deactivation requested
+      </span>
+    );
+  }
+
+  // Otherwise the API sends the status as the text "Active" or "Deactivated"
   const isActive = status === PROSUMER_STATUS.ACTIVE;
 
   return <StatusPill isActive={isActive} />;

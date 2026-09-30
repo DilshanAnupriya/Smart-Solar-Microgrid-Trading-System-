@@ -112,6 +112,14 @@ public class AuthService : IAuthService
                 "This account has been deactivated. Please contact a Backoffice officer to reactivate it.");
         }
 
+        // Business rule: an account with an open deactivation request is blocked
+        // until a Backoffice officer approves or rejects the request
+        if (prosumer.Status == ProsumerStatus.PendingDeactivation)
+        {
+            throw new AccountDeactivatedException(
+                "Your deactivation request is waiting for Backoffice approval. The account is blocked until it is reviewed.");
+        }
+
         // The token carries the NIC and the Prosumer role
         var token = _tokenService.CreateToken(prosumer);
 

@@ -68,15 +68,19 @@ export const REFERENCE_NODES = [
 ];
 
 // Prosumer account status, spelled exactly as the API's ProsumerStatus enum
-// serialises it. The API rejects anything other than these two words.
+// serialises it. The API rejects anything other than these three words.
+// PendingDeactivation means the prosumer asked to deactivate from the mobile
+// app: the account is blocked until a Backoffice officer approves or rejects.
 export const PROSUMER_STATUS = {
   ACTIVE: 'Active',
+  PENDING_DEACTIVATION: 'PendingDeactivation',
   DEACTIVATED: 'Deactivated',
 };
 
 // Used to build the status filter on the prosumer list page
 export const PROSUMER_STATUS_OPTIONS = [
   { value: PROSUMER_STATUS.ACTIVE, label: 'Active' },
+  { value: PROSUMER_STATUS.PENDING_DEACTIVATION, label: 'Deactivation requested' },
   { value: PROSUMER_STATUS.DEACTIVATED, label: 'Deactivated' },
 ];
 

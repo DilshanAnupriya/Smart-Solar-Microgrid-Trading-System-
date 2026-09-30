@@ -52,7 +52,9 @@
     <string name="profile_nic_subtitle">NIC %1$s</string>
     <string name="profile_status_active">Active</string>
     <string name="profile_status_deactivated">Deactivated</string>
+    <string name="profile_status_pending_deactivation">Deactivation requested</string>
     <string name="profile_deactivated_banner">Your account is deactivated. You can\'t sign in or trade energy until a Backoffice officer reactivates it.</string>
+    <string name="profile_pending_deactivation_banner">Your deactivation request is waiting for Backoffice approval. Your account is blocked until it is reviewed.</string>
     <string name="profile_details_heading">Personal details</string>
     <string name="profile_nic_label">NIC number</string>
     <string name="profile_nic_locked">Your account ID. It can\'t be changed.</string>
@@ -68,11 +70,11 @@
     <string name="session_expired">Your session has expired. Please sign in again.</string>
 
     <!-- Deactivate confirmation -->
-    <string name="deactivate_title">Deactivate your account?</string>
-    <string name="deactivate_message">You won\'t be able to sign in or trade energy after this. Only a Backoffice officer can reactivate your account.</string>
-    <string name="deactivate_confirm">Deactivate</string>
+    <string name="deactivate_title">Request account deactivation?</string>
+    <string name="deactivate_message">Your request will be sent to a Backoffice officer for approval. Your account will be blocked straight away: you won\'t be able to sign in or trade energy while the request is reviewed.</string>
+    <string name="deactivate_confirm">Send request</string>
     <string name="deactivate_cancel">Cancel</string>
-    <string name="deactivate_success">Your account has been deactivated.</string>
+    <string name="deactivate_success">Deactivation request sent. Your account is blocked until a Backoffice officer reviews it.</string>
 
     <!-- Edit profile screen -->
     <string name="edit_profile_title">Edit profile</string>
