@@ -15,14 +15,16 @@ package com.example.mobileapp.network
  */
 object ApiConfig {
 
-    // Android emulator: 10.0.2.2 is the computer running the emulator, so this reaches the API
-    // started with `dotnet run` (http profile, port 5262 in launchSettings.json).
-    // On a real phone: use the computer's LAN IP instead (e.g. http://192.168.1.20:5262/api),
-    // start the API with `dotnet run --urls http://0.0.0.0:5262`, and add the same IP to
-    // res/xml/network_security_config.xml.
-    const val BASE_URL = "http://10.0.2.2:5262/api"
+    // Default candidates for emulator and USB ADB reverse
+    val CANDIDATE_URLS = listOf(
+        "http://127.0.0.1:5262/api",
+        "http://10.0.2.2:5262/api"
+    )
 
-    // Give up connecting after 10 seconds, and waiting for a reply after 15
-    const val CONNECT_TIMEOUT_MS = 10_000
+    @Volatile
+    var BASE_URL = "http://127.0.0.1:5262/api"
+
+    // Give up connecting after 5 seconds, and waiting for a reply after 15
+    const val CONNECT_TIMEOUT_MS = 5_000
     const val READ_TIMEOUT_MS = 15_000
 }

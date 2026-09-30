@@ -54,8 +54,8 @@ public class ReservationService : IReservationService
     /// </summary>
     public async Task<ReservationResponseDto> GetByIdAsync(string id)
     {
-        // Look up by id and throw 404 if not found
-        var reservation = await _repository.GetByIdAsync(id);
+        // Look up by id or reservation reference number and throw 404 if not found
+        var reservation = await _repository.GetByIdAsync(id) ?? await _repository.GetByNumberAsync(id);
         if (reservation is null)
         {
             throw new NotFoundException($"Reservation with id '{id}' was not found.");
@@ -102,7 +102,7 @@ public class ReservationService : IReservationService
             SlotEndTime = endUtc,
             EnergyAmountKWh = dto.EnergyAmountKWh,
             ReservationType = dto.ReservationType.Trim(),
-            Status = ReservationStatus.Approved, // Auto-approved on creation or pending confirmation
+            Status = ReservationStatus.Pending, // Initial state awaiting grid operator approval
             TransactionQrCode = qrData,
             Notes = dto.Notes?.Trim(),
             CreatedAt = now,
@@ -121,8 +121,8 @@ public class ReservationService : IReservationService
     /// </summary>
     public async Task<ReservationResponseDto> UpdateAsync(string id, UpdateReservationDto dto)
     {
-        // Fetch existing reservation
-        var reservation = await _repository.GetByIdAsync(id);
+        // Fetch existing reservation by ID or reservation number
+        var reservation = await _repository.GetByIdAsync(id) ?? await _repository.GetByNumberAsync(id);
         if (reservation is null)
         {
             throw new NotFoundException($"Reservation with id '{id}' was not found.");
@@ -172,8 +172,8 @@ public class ReservationService : IReservationService
     /// </summary>
     public async Task<ReservationResponseDto> CancelAsync(string id, CancelReservationDto dto)
     {
-        // Fetch existing reservation
-        var reservation = await _repository.GetByIdAsync(id);
+        // Fetch existing reservation by ID or reservation number
+        var reservation = await _repository.GetByIdAsync(id) ?? await _repository.GetByNumberAsync(id);
         if (reservation is null)
         {
             throw new NotFoundException($"Reservation with id '{id}' was not found.");
@@ -210,8 +210,8 @@ public class ReservationService : IReservationService
     /// </summary>
     public async Task<ReservationResponseDto> UpdateStatusAsync(string id, UpdateReservationStatusDto dto)
     {
-        // Fetch existing reservation
-        var reservation = await _repository.GetByIdAsync(id);
+        // Fetch existing reservation by ID or reservation number
+        var reservation = await _repository.GetByIdAsync(id) ?? await _repository.GetByNumberAsync(id);
         if (reservation is null)
         {
             throw new NotFoundException($"Reservation with id '{id}' was not found.");

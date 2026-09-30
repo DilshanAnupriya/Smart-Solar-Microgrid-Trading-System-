@@ -60,15 +60,19 @@ public class NodeRepository : INodeRepository
             .ToListAsync();
     }
 
-    /// <summary>Finds one node after safely validating the ObjectId text.</summary>
+    /// <summary>Finds one node by ObjectId or node-code (e.g. NODE-KANDY-02).</summary>
     public async Task<MicrogridNode?> GetByIdAsync(string id)
     {
-        if (!ObjectId.TryParse(id, out _))
+        if (string.IsNullOrWhiteSpace(id)) return null;
+
+        var trimmed = id.Trim();
+        if (ObjectId.TryParse(trimmed, out _))
         {
-            return null;
+            var node = await _nodes.Find(node => node.Id == trimmed).FirstOrDefaultAsync();
+            if (node != null) return node;
         }
 
-        return await _nodes.Find(node => node.Id == id).FirstOrDefaultAsync();
+        return await _nodes.Find(node => node.NodeCode == trimmed.ToUpperInvariant()).FirstOrDefaultAsync();
     }
 
     /// <summary>Checks node-code uniqueness, excluding the current node on edit.</summary>

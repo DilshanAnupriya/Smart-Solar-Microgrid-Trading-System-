@@ -55,4 +55,13 @@ object UiUtils {
         )
         activity.finish()
     }
+
+    /**
+     * Up to two uppercase initials for an avatar, e.g. "Operator One" -> "OO".
+     */
+    fun initials(name: String): String {
+        val parts = name.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }
+        if (parts.isEmpty()) return "OP"
+        return parts.take(2).joinToString("") { it.first().uppercase() }
+    }
 }

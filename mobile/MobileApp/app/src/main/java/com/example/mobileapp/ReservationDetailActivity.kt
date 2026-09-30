@@ -1,6 +1,5 @@
 package com.example.mobileapp
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
@@ -11,12 +10,16 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import com.example.mobileapp.network.ApiResult
+import com.example.mobileapp.network.ReservationApi
+import com.example.mobileapp.utils.BaseActivity
+import kotlinx.coroutines.launch
 
 /**
  * One reservation. Modify and Cancel appear in the top bar only while the reservation is
  * active and at least 12 hours away; the transaction QR code appears once it's approved.
  */
-class ReservationDetailActivity : Activity() {
+class ReservationDetailActivity : BaseActivity() {
 
     private lateinit var reservationId: String
 
@@ -132,11 +135,29 @@ class ReservationDetailActivity : Activity() {
             return
         }
 
-        // UI only for now: PATCH /api/reservations/{id}/cancel goes here
-        ReservationStore.cancel(reservationId)
-        startActivity(
-            ReservationSummaryActivity.createIntent(this, reservationId, ReservationSummaryActivity.Action.CANCELLED)
-        )
+        btnCancel.isEnabled = false
+        uiScope.launch {
+            val api = ReservationApi(this@ReservationDetailActivity)
+            val result = api.cancelReservation(reservationId, "Cancelled by user via mobile app")
+            when (result) {
+                is ApiResult.Success -> {
+                    val updated = ReservationStore.fromApiReservation(result.data)
+                    ReservationStore.addOrUpdate(updated)
+                    startActivity(
+                        ReservationSummaryActivity.createIntent(
+                            this@ReservationDetailActivity,
+                            updated.id,
+                            ReservationSummaryActivity.Action.CANCELLED
+                        )
+                    )
+                    finish()
+                }
+                is ApiResult.Failure -> {
+                    btnCancel.isEnabled = true
+                    Toast.makeText(this@ReservationDetailActivity, result.message, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
     }
 
     companion object {

@@ -21,7 +21,7 @@ namespace SmartSolar.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = $"{UserRoles.Backoffice},{UserRoles.GridOperator}")]
+[Authorize(Roles = $"{UserRoles.Backoffice},{UserRoles.GridOperator},{UserRoles.Prosumer}")]
 public class ReservationsController : ControllerBase
 {
     private readonly IReservationService _reservationService;
@@ -48,6 +48,16 @@ public class ReservationsController : ControllerBase
         [FromQuery] DateTime? toDate,
         [FromQuery] string? search)
     {
+        // If prosumer, restrict to caller's own bookings
+        if (User.IsInRole(UserRoles.Prosumer))
+        {
+            var callerNic = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!string.IsNullOrWhiteSpace(callerNic))
+            {
+                nic = callerNic;
+            }
+        }
+
         // Query reservations matching filter criteria
         var results = await _reservationService.GetAllAsync(nic, nodeId, status, fromDate, toDate, search);
         return Ok(results);
@@ -63,6 +73,17 @@ public class ReservationsController : ControllerBase
     {
         // Retrieve single reservation by id
         var reservation = await _reservationService.GetByIdAsync(id);
+
+        if (User.IsInRole(UserRoles.Prosumer))
+        {
+            var callerNic = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!string.IsNullOrWhiteSpace(callerNic) &&
+                !string.Equals(reservation.ProsumerNic, callerNic, StringComparison.OrdinalIgnoreCase))
+            {
+                return Forbid();
+            }
+        }
+
         return Ok(reservation);
     }
 
@@ -70,6 +91,7 @@ public class ReservationsController : ControllerBase
     /// GET api/reservations/stats — returns aggregated counts for dashboards.
     /// </summary>
     [HttpGet("stats")]
+    [Authorize(Roles = $"{UserRoles.Backoffice},{UserRoles.GridOperator}")]
     [ProducesResponseType(typeof(ReservationStatsDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetStats()
     {
@@ -86,10 +108,26 @@ public class ReservationsController : ControllerBase
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromBody] CreateReservationDto dto)
     {
+        // If prosumer, enforce their own NIC and name from token claims
+        if (User.IsInRole(UserRoles.Prosumer))
+        {
+            var callerNic = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!string.IsNullOrWhiteSpace(callerNic))
+            {
+                dto.ProsumerNic = callerNic;
+            }
+
+            var callerName = User.FindFirstValue(ClaimTypes.Name);
+            if (!string.IsNullOrWhiteSpace(callerName) && string.IsNullOrWhiteSpace(dto.ProsumerName))
+            {
+                dto.ProsumerName = callerName;
+            }
+        }
+
         // Identify the user making the booking
         var username = User.FindFirstValue(ClaimTypes.Name) ??
                        User.FindFirstValue(ClaimTypes.Email) ??
-                       "operator";
+                       "prosumer";
 
         var created = await _reservationService.CreateAsync(dto, username);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
@@ -104,6 +142,17 @@ public class ReservationsController : ControllerBase
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(string id, [FromBody] UpdateReservationDto dto)
     {
+        if (User.IsInRole(UserRoles.Prosumer))
+        {
+            var existing = await _reservationService.GetByIdAsync(id);
+            var callerNic = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!string.IsNullOrWhiteSpace(callerNic) &&
+                !string.Equals(existing.ProsumerNic, callerNic, StringComparison.OrdinalIgnoreCase))
+            {
+                return Forbid();
+            }
+        }
+
         // Update slot details with 12-hour notice validation
         var updated = await _reservationService.UpdateAsync(id, dto);
         return Ok(updated);
@@ -118,6 +167,17 @@ public class ReservationsController : ControllerBase
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Cancel(string id, [FromBody] CancelReservationDto dto)
     {
+        if (User.IsInRole(UserRoles.Prosumer))
+        {
+            var existing = await _reservationService.GetByIdAsync(id);
+            var callerNic = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!string.IsNullOrWhiteSpace(callerNic) &&
+                !string.Equals(existing.ProsumerNic, callerNic, StringComparison.OrdinalIgnoreCase))
+            {
+                return Forbid();
+            }
+        }
+
         // Cancel reservation with 12-hour notice validation
         var cancelled = await _reservationService.CancelAsync(id, dto);
         return Ok(cancelled);
@@ -127,6 +187,7 @@ public class ReservationsController : ControllerBase
     /// PATCH api/reservations/{id}/status — updates reservation status (e.g. Approved, Completed).
     /// </summary>
     [HttpPatch("{id}/status")]
+    [Authorize(Roles = $"{UserRoles.Backoffice},{UserRoles.GridOperator}")]
     [ProducesResponseType(typeof(ReservationResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
@@ -142,6 +203,7 @@ public class ReservationsController : ControllerBase
     /// Used to block microgrid node deactivation.
     /// </summary>
     [HttpGet("node/{nodeId}/active-check")]
+    [Authorize(Roles = $"{UserRoles.Backoffice},{UserRoles.GridOperator}")]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     public async Task<IActionResult> CheckActiveNodeReservations(string nodeId)
     {

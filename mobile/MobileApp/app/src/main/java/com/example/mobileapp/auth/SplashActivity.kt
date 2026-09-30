@@ -26,8 +26,15 @@ class SplashActivity : Activity() {
         // A saved, unexpired prosumer session goes straight to the profile (the prosumer's home)
         super.onCreate(savedInstanceState)
         val sessionManager = SessionManager(this)
-        val next = if (sessionManager.hasValidSession() && sessionManager.getRole() == LocalUser.ROLE_PROSUMER) {
-            ProfileActivity::class.java
+        val next = if (sessionManager.hasValidSession()) {
+            when (sessionManager.getRole()) {
+                LocalUser.ROLE_OPERATOR -> com.example.mobileapp.operator.OperatorDashboardActivity::class.java
+                LocalUser.ROLE_PROSUMER -> ProfileActivity::class.java
+                else -> {
+                    sessionManager.clearSession()
+                    LoginActivity::class.java
+                }
+            }
         } else {
             // Drop an expired session so the login screen starts clean
             sessionManager.clearSession()

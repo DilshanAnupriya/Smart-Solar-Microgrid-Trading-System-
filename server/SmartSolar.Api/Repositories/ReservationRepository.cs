@@ -88,12 +88,20 @@ public class ReservationRepository : IReservationRepository
     }
 
     /// <summary>
-    /// Returns a single reservation by its MongoDB ObjectId.
+    /// Returns a single reservation by its MongoDB ObjectId or reference number.
     /// </summary>
     public async Task<Reservation?> GetByIdAsync(string id)
     {
-        // Lookup by primary key
-        return await _reservations.Find(r => r.Id == id).FirstOrDefaultAsync();
+        if (string.IsNullOrWhiteSpace(id)) return null;
+
+        var trimmed = id.Trim();
+        if (ObjectId.TryParse(trimmed, out _))
+        {
+            var byId = await _reservations.Find(r => r.Id == trimmed).FirstOrDefaultAsync();
+            if (byId != null) return byId;
+        }
+
+        return await _reservations.Find(r => r.ReservationNumber == trimmed).FirstOrDefaultAsync();
     }
 
     /// <summary>

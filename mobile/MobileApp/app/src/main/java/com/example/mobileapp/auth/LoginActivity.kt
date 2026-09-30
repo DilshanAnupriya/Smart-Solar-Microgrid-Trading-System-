@@ -14,11 +14,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import com.example.mobileapp.R
+import com.example.mobileapp.models.LocalUser
 import com.example.mobileapp.network.ApiResult
 import com.example.mobileapp.network.AuthApi
 import com.example.mobileapp.profile.ProfileActivity
@@ -35,6 +37,10 @@ import kotlinx.coroutines.launch
  */
 class LoginActivity : BaseActivity() {
 
+    private lateinit var btnRoleProsumer: Button
+    private lateinit var btnRoleOperator: Button
+    private lateinit var tvIdentifierLabel: TextView
+    private lateinit var layoutRegisterContainer: View
     private lateinit var etIdentifier: EditText
     private lateinit var etPassword: EditText
     private lateinit var btnTogglePassword: Button
@@ -42,17 +48,25 @@ class LoginActivity : BaseActivity() {
     private lateinit var tvFormError: TextView
 
     private var isPasswordVisible = false
+    private var isOperatorMode = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Find the views and connect the buttons
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        btnRoleProsumer = findViewById(R.id.btnRoleProsumer)
+        btnRoleOperator = findViewById(R.id.btnRoleOperator)
+        tvIdentifierLabel = findViewById(R.id.tvIdentifierLabel)
+        layoutRegisterContainer = findViewById(R.id.layoutRegisterContainer)
         etIdentifier = findViewById(R.id.etIdentifier)
         etPassword = findViewById(R.id.etPassword)
         btnTogglePassword = findViewById(R.id.btnTogglePassword)
         btnSignIn = findViewById(R.id.btnSignIn)
         tvFormError = findViewById(R.id.tvFormError)
+
+        btnRoleProsumer.setOnClickListener { setRoleMode(false) }
+        btnRoleOperator.setOnClickListener { setRoleMode(true) }
 
         btnTogglePassword.setOnClickListener { togglePasswordVisibility() }
         btnSignIn.setOnClickListener { attemptSignIn() }
@@ -69,6 +83,31 @@ class LoginActivity : BaseActivity() {
             } else {
                 false
             }
+        }
+    }
+
+    private fun setRoleMode(isOperator: Boolean) {
+        isOperatorMode = isOperator
+        UiUtils.showBanner(tvFormError, null)
+
+        if (isOperator) {
+            btnRoleOperator.setBackgroundResource(R.drawable.bg_role_tab_active)
+            btnRoleOperator.setTextColor(getColor(R.color.white))
+            btnRoleProsumer.setBackground(null)
+            btnRoleProsumer.setTextColor(getColor(R.color.text_dark))
+
+            tvIdentifierLabel.setText(R.string.login_operator_identifier_label)
+            etIdentifier.setHint(R.string.login_operator_identifier_hint)
+            layoutRegisterContainer.visibility = View.GONE
+        } else {
+            btnRoleProsumer.setBackgroundResource(R.drawable.bg_role_tab_active)
+            btnRoleProsumer.setTextColor(getColor(R.color.white))
+            btnRoleOperator.setBackground(null)
+            btnRoleOperator.setTextColor(getColor(R.color.text_dark))
+
+            tvIdentifierLabel.setText(R.string.login_identifier_label)
+            etIdentifier.setHint(R.string.login_identifier_hint)
+            layoutRegisterContainer.visibility = View.VISIBLE
         }
     }
 
@@ -93,7 +132,7 @@ class LoginActivity : BaseActivity() {
     }
 
     /**
-     * Checks the fields are filled in, then calls POST /auth/prosumer-login.
+     * Checks the fields are filled in, then calls authentication endpoint based on selected role.
      */
     private fun attemptSignIn() {
         // Only emptiness is checked here; everything else is the API's decision
@@ -111,15 +150,36 @@ class LoginActivity : BaseActivity() {
         UiUtils.showBanner(tvFormError, null)
         setLoading(true)
 
+        val authApi = AuthApi(this@LoginActivity)
+
         uiScope.launch {
-            when (val result = AuthApi(this@LoginActivity).prosumerLogin(identifier, password)) {
+            val result = if (isOperatorMode) {
+                authApi.operatorLogin(identifier, password)
+            } else {
+                authApi.prosumerLogin(identifier, password)
+            }
+
+            when (result) {
                 is ApiResult.Success -> {
                     // Keep the token and profile in SQLite, so the app stays signed in after closing
                     SessionManager(this@LoginActivity).saveSession(result.data)
-                    openHome()
+                    openHome(result.data.role)
                 }
                 is ApiResult.Failure -> {
-                    // Wrong details (401) and a deactivated account (403) both come with the API's reason
+                    // If prosumer login was attempted with operator credentials, try operator login automatically
+                    if (!isOperatorMode && (identifier.contains("@") || identifier.equals("operator", ignoreCase = true))) {
+                        when (val opResult = authApi.operatorLogin(identifier, password)) {
+                            is ApiResult.Success -> {
+                                SessionManager(this@LoginActivity).saveSession(opResult.data)
+                                openHome(opResult.data.role)
+                                return@launch
+                            }
+                            is ApiResult.Failure -> {
+                                // Continue with original failure
+                            }
+                        }
+                    }
+
                     setLoading(false)
                     showServerFieldErrors(
                         mapOf("identifier" to etIdentifier, "password" to etPassword),
@@ -143,12 +203,17 @@ class LoginActivity : BaseActivity() {
     }
 
     /**
-     * Opens the prosumer's home screen and removes this screen from the back stack.
+     * Opens the role-specific home screen and removes this screen from the back stack.
      */
-    private fun openHome() {
-        // A new task, so pressing Back on the profile does not return to the login screen
+    private fun openHome(role: String) {
+        val nextClass = if (role.equals(LocalUser.ROLE_OPERATOR, ignoreCase = true)) {
+            com.example.mobileapp.operator.OperatorDashboardActivity::class.java
+        } else {
+            ProfileActivity::class.java
+        }
+
         startActivity(
-            Intent(this, ProfileActivity::class.java)
+            Intent(this, nextClass)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         )
         finish()
