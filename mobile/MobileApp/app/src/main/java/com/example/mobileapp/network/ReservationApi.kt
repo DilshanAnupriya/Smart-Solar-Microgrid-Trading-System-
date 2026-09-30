@@ -203,18 +203,24 @@ class ReservationApi(context: Context) {
      * Searches for a reservation using either MongoDB ObjectId, reservation number, or QR token key.
      */
     suspend fun findByReference(reference: String): ApiResult<ApiReservation> {
-        val clean = reference.trim()
+        val clean = reference.trim().removeSurrounding("\"").removeSurrounding("'")
         if (clean.isBlank()) {
             return ApiResult.Failure("Reference code cannot be empty.", 400)
         }
 
-        // Try direct ID lookup first
+        // 1. Try direct ID or reservation number lookup via GET /reservations/{clean}
         val direct = getById(clean)
         if (direct is ApiResult.Success) {
             return direct
         }
 
-        // Search by query string (matches reservation number, NIC, or node)
+        // 2. Search local SQLite cache as an immediate fallback
+        val cached = reservationDao.findByIdOrNumber(clean)
+        if (cached != null) {
+            return ApiResult.Success(cached, "Loaded from offline cache.")
+        }
+
+        // 3. Search by query string (matches reservation number, NIC, or node name)
         val searchResult = getAll(search = clean)
         return when (searchResult) {
             is ApiResult.Success -> {
@@ -222,7 +228,7 @@ class ReservationApi(context: Context) {
                     it.reservationNumber.equals(clean, ignoreCase = true) ||
                         it.id.equals(clean, ignoreCase = true) ||
                         it.transactionQrCode.contains(clean, ignoreCase = true)
-                } ?: searchResult.data.firstOrNull()
+                }
 
                 if (match != null) {
                     ApiResult.Success(match, "Reservation located.")
@@ -230,7 +236,9 @@ class ReservationApi(context: Context) {
                     ApiResult.Failure("No reservation found matching reference '$clean'.", 404)
                 }
             }
-            is ApiResult.Failure -> direct // Return the original failure
+            is ApiResult.Failure -> {
+                ApiResult.Failure("No reservation found matching reference '$clean'.", 404)
+            }
         }
     }
 

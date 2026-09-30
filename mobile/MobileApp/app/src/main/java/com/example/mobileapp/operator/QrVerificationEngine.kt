@@ -143,7 +143,7 @@ class QrVerificationEngine(private val context: Context) {
 
     companion object {
         fun extractReference(rawQr: String): String {
-            val trimmed = rawQr.trim()
+            val trimmed = rawQr.trim().removeSurrounding("\"").removeSurrounding("'")
 
             // 1. Check for SSM-RSV format: SSM-RSV|<id>|<token>
             if (trimmed.startsWith("SSM-RSV|")) {
@@ -158,8 +158,8 @@ class QrVerificationEngine(private val context: Context) {
                 return trimmed
             }
 
-            // 3. Check for standard reservation reference prefixes
-            if (trimmed.matches(Regex("^(RES|BK|SSM)-[A-Za-z0-9-]+$"))) {
+            // 3. Check for standard reservation reference prefixes (including RSV)
+            if (trimmed.matches(Regex("^(RES|BK|SSM|RSV)-[A-Za-z0-9-]+$"))) {
                 return trimmed
             }
 
@@ -182,6 +182,8 @@ class QrVerificationEngine(private val context: Context) {
                     if (parts.isNotEmpty() && parts[0].isNotBlank()) {
                         return parts[0].trim()
                     }
+                } else if (decodedString.matches(Regex("^(RES|BK|SSM|RSV)-[A-Za-z0-9-]+$"))) {
+                    return decodedString.trim()
                 } else if (decodedString.length in 5..50) {
                     return decodedString.trim()
                 }

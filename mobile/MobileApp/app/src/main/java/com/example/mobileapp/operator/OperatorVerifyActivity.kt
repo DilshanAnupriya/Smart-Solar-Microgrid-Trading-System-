@@ -29,6 +29,7 @@ import com.example.mobileapp.network.ApiResult
 import com.example.mobileapp.network.NodeApi
 import com.example.mobileapp.network.ReservationApi
 import com.example.mobileapp.utils.BaseActivity
+import com.example.mobileapp.utils.DateTimeUtils
 import com.example.mobileapp.utils.UiUtils
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -241,9 +242,8 @@ class OperatorVerifyActivity : BaseActivity() {
         tvTradingType.text = if (res.isDropOff) "Drop-Off (Sell to Grid)" else "Charging (Buy from Grid)"
         tvEnergyQuantity.text = String.format(Locale.US, "%.2f kWh", res.energyAmountKWh)
 
-        val start = res.slotStartTime.replace("T", " ").take(16)
-        val end = res.slotEndTime.replace("T", " ").take(16)
-        tvSlotSchedule.text = if (start.isNotBlank()) "$start to $end" else "Standard Scheduled Slot"
+        val schedule = DateTimeUtils.formatSlotRange(res.slotStartTime, res.slotEndTime)
+        tvSlotSchedule.text = if (schedule.isNotBlank()) schedule else "Standard Scheduled Slot"
     }
 
     private fun bindProsumer(p: Prosumer) {

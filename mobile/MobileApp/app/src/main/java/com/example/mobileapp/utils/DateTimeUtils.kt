@@ -68,6 +68,53 @@ object DateTimeUtils {
     }
 
     /**
+     * e.g. "3:00 PM", in Sri Lanka time.
+     */
+    fun formatTime(millis: Long): String {
+        val format = SimpleDateFormat("h:mm a", Locale.getDefault())
+        format.timeZone = SRI_LANKA
+        return format.format(Date(millis))
+    }
+
+    /**
+     * e.g. "29 Sep 2026, 3:00 PM", in Sri Lanka time.
+     */
+    fun formatDateTime(millis: Long): String {
+        val format = SimpleDateFormat("d MMM yyyy, h:mm a", Locale.getDefault())
+        format.timeZone = SRI_LANKA
+        return format.format(Date(millis))
+    }
+
+    /**
+     * Formats an ISO-8601 start and end time into a friendly display:
+     * e.g. "30 Sep 2026, 3:00 PM to 5:00 PM"
+     */
+    fun formatSlotRange(startIso: String?, endIso: String?): String {
+        val startMillis = parseIsoToMillis(startIso)
+        val endMillis = parseIsoToMillis(endIso)
+
+        if (startMillis == null) {
+            return if (!startIso.isNullOrBlank()) startIso.replace("T", " ").take(16) else "Scheduled Slot"
+        }
+
+        val startDate = formatDate(startMillis)
+        val startTime = formatTime(startMillis)
+
+        if (endMillis == null) {
+            return "$startDate, $startTime"
+        }
+
+        val endDate = formatDate(endMillis)
+        val endTime = formatTime(endMillis)
+
+        return if (startDate == endDate) {
+            "$startDate, $startTime to $endTime"
+        } else {
+            "$startDate $startTime to $endDate $endTime"
+        }
+    }
+
+    /**
      * Offset of a "+05:30", "-0100" or "Z" suffix in milliseconds; no suffix means UTC.
      */
     private fun offsetMillis(zone: String): Long {

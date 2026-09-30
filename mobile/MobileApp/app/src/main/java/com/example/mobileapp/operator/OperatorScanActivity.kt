@@ -113,10 +113,10 @@ class OperatorScanActivity : BaseActivity(), TextureView.SurfaceTextureListener 
         }
 
         // Quick demo test buttons for viva demonstrations
-        btnDemoColombo.setOnClickListener { onQrCodeScanned("RES-20260922-A101") }
-        btnDemoKandy.setOnClickListener { onQrCodeScanned("RES-20260922-B202") }
-        btnDemoPending.setOnClickListener { onQrCodeScanned("RES-20260922-D404") }
-        btnDemoGalle.setOnClickListener { onQrCodeScanned("RES-20260922-C303") }
+        btnDemoColombo.setOnClickListener { onQrCodeScanned("RES-20260923-A101") }
+        btnDemoKandy.setOnClickListener { onQrCodeScanned("RES-20260930-BDD9AD") }
+        btnDemoPending.setOnClickListener { onQrCodeScanned("RES-20260923-D404") }
+        btnDemoGalle.setOnClickListener { onQrCodeScanned("RES-20260923-C303") }
     }
 
     private fun checkCameraPermission() {
