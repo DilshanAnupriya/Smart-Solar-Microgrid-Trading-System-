@@ -44,11 +44,46 @@
                 android:textColor="@color/text_muted"
                 android:textSize="15sp" />
 
-            <!-- Email / username / phone -->
+            <!-- Role Selection Toggle: Prosumer vs Grid Operator -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_option"
+                android:padding="3dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnRoleProsumer"
+                    style="@style/ButtonOutline"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_role_tab_active"
+                    android:text="@string/login_role_prosumer"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btnRoleOperator"
+                    style="@style/ButtonOutline"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:text="@string/login_role_operator"
+                    android:textColor="@color/text_dark"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Identifier (NIC, Email or Username) -->
             <TextView
+                android:id="@+id/tvIdentifierLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="24dp"
                 android:text="@string/login_identifier_label"
                 android:textColor="@color/text_dark"
                 android:textSize="16sp" />
@@ -118,6 +153,15 @@
                     android:textSize="16sp" />
             </LinearLayout>
 
+            <!-- The API's reason when sign-in fails, e.g. wrong details or a deactivated account -->
+            <TextView
+                android:id="@+id/tvFormError"
+                style="@style/Banner"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_banner_danger"
+                android:textColor="@color/danger_text"
+                android:visibility="gone" />
+
             <Button
                 android:id="@+id/btnSignIn"
                 android:layout_width="match_parent"
@@ -132,6 +176,7 @@
 
             <!-- Link to prosumer self-registration -->
             <LinearLayout
+                android:id="@+id/layoutRegisterContainer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"

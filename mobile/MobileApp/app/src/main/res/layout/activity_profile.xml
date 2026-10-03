@@ -17,6 +17,15 @@
             style="@style/TopBarTitle"
             android:text="@string/profile_title" />
 
+        <!-- Spins while the profile is loading or an action is being sent -->
+        <ProgressBar
+            android:id="@+id/progressLoading"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginEnd="12dp"
+            android:visibility="gone" />
+
         <Button
             android:id="@+id/btnEdit"
             style="@style/SmallButton.PrimaryOutline"
@@ -43,6 +52,18 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
+
+            <!-- Shown when the API can't be reached: the details below are the copy saved
+                 in SQLite. Tapping it tries again. -->
+            <TextView
+                android:id="@+id/tvOfflineBanner"
+                style="@style/Banner"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/bg_banner_warning"
+                android:clickable="true"
+                android:focusable="true"
+                android:textColor="@color/warning_text"
+                android:visibility="gone" />
 
             <!-- Shown only when the account is deactivated -->
             <TextView
@@ -246,6 +267,13 @@
                         style="@style/ProfileValue" />
                 </LinearLayout>
             </LinearLayout>
+
+            <!-- Signs out on this phone only; the account stays active -->
+            <Button
+                android:id="@+id/btnSignOut"
+                style="@style/WideButton.SecondaryOutline"
+                android:layout_marginTop="24dp"
+                android:text="@string/profile_sign_out" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

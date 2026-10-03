@@ -3,19 +3,20 @@
 
     <!-- Login screen -->
     <string name="login_title">Smart Solar Microgrid</string>
-    <string name="login_subtitle">Sign in to the management console</string>
-    <string name="login_identifier_label">Email, username or phone number</string>
-    <string name="login_identifier_hint">you@smartsolar.lk, username or 0771234567</string>
+    <string name="login_subtitle">Sign in to your prosumer account</string>
+    <string name="login_identifier_label">NIC or email</string>
+    <string name="login_identifier_hint">991234567V or you@example.com</string>
     <string name="login_password_label">Password</string>
     <string name="login_password_hint">Enter your password</string>
     <string name="login_show_password">Show</string>
     <string name="login_hide_password">Hide</string>
     <string name="login_sign_in">Sign in</string>
     <string name="login_logo_description">Smart Solar Microgrid logo</string>
-    <string name="login_error_identifier_required">Enter your email, username or phone number</string>
+    <string name="login_error_identifier_required">Enter your NIC or email</string>
     <string name="login_error_password_required">Enter your password</string>
     <string name="login_no_account">Don\'t have an account?</string>
     <string name="login_go_to_register">Register</string>
+    <string name="login_signing_in">Signing in…</string>
 
     <!-- Register screen -->
     <string name="register_back">Back to sign in</string>
@@ -40,7 +41,9 @@
     <string name="register_submit">Create account</string>
     <string name="register_have_account">Already have an account?</string>
     <string name="register_go_to_login">Sign in</string>
-    <string name="register_not_connected">Registration is not connected to the server yet</string>
+    <string name="register_creating">Creating account…</string>
+    <string name="register_success">Account created. Welcome!</string>
+    <string name="register_success_sign_in">Account created. Please sign in with your NIC and password.</string>
 
     <!-- Profile screen -->
     <string name="profile_title">My profile</string>
@@ -49,7 +52,9 @@
     <string name="profile_nic_subtitle">NIC %1$s</string>
     <string name="profile_status_active">Active</string>
     <string name="profile_status_deactivated">Deactivated</string>
+    <string name="profile_status_pending_deactivation">Deactivation requested</string>
     <string name="profile_deactivated_banner">Your account is deactivated. You can\'t sign in or trade energy until a Backoffice officer reactivates it.</string>
+    <string name="profile_pending_deactivation_banner">Your deactivation request is waiting for Backoffice approval. Your account is blocked until it is reviewed.</string>
     <string name="profile_details_heading">Personal details</string>
     <string name="profile_nic_label">NIC number</string>
     <string name="profile_nic_locked">Your account ID. It can\'t be changed.</string>
@@ -57,14 +62,19 @@
     <string name="profile_phone_label">Phone number</string>
     <string name="profile_address_label">Address</string>
     <string name="profile_member_since_label">Member since</string>
-    <string name="profile_updated">Profile updated (not saved to the server yet)</string>
+    <string name="profile_updated">Profile updated</string>
+    <string name="profile_member_since_unknown">—</string>
+    <string name="profile_sign_out">Sign out</string>
+    <string name="profile_signed_out">You have signed out.</string>
+    <string name="profile_offline_banner">%1$s\nShowing the details saved on this phone. Tap here to try again.</string>
+    <string name="session_expired">Your session has expired. Please sign in again.</string>
 
     <!-- Deactivate confirmation -->
-    <string name="deactivate_title">Deactivate your account?</string>
-    <string name="deactivate_message">You won\'t be able to sign in or trade energy after this. Only a Backoffice officer can reactivate your account.</string>
-    <string name="deactivate_confirm">Deactivate</string>
+    <string name="deactivate_title">Request account deactivation?</string>
+    <string name="deactivate_message">Your request will be sent to a Backoffice officer for approval. Your account will be blocked straight away: you won\'t be able to sign in or trade energy while the request is reviewed.</string>
+    <string name="deactivate_confirm">Send request</string>
     <string name="deactivate_cancel">Cancel</string>
-    <string name="deactivate_not_connected">Deactivation is not connected to the server yet</string>
+    <string name="deactivate_success">Deactivation request sent. Your account is blocked until a Backoffice officer reviews it.</string>
 
     <!-- Edit profile screen -->
     <string name="edit_profile_title">Edit profile</string>
@@ -72,6 +82,7 @@
     <string name="edit_profile_nic_helper">Your NIC is your account ID and can\'t be changed.</string>
     <string name="edit_profile_save">Save changes</string>
     <string name="edit_profile_cancel">Cancel</string>
+    <string name="edit_profile_saving">Saving…</string>
 
     <!-- Profile: link to reservations -->
     <string name="profile_reservations_title">Energy reservations</string>
@@ -121,6 +132,7 @@
     <string name="reservation_energy_helper">Between 1 and 100 kWh.</string>
     <string name="reservation_submit_new">Request reservation</string>
     <string name="reservation_submit_modify">Save changes</string>
+    <string name="reservation_submitting">Submitting…</string>
 
     <!-- Reservation detail -->
     <string name="reservation_detail_title">Reservation</string>
@@ -161,20 +173,72 @@
     <string name="error_energy_required">Enter the energy amount.</string>
     <string name="error_energy_range">Enter an amount between 1 and 100 kWh.</string>
 
-    <!-- Prosumer form errors (same wording as the web client) -->
+    <!-- Prosumer form errors. Only "required" and the password match are checked on the
+         phone; format and length problems come from the API and are shown on the field. -->
     <string name="error_nic_required">NIC number is required.</string>
-    <string name="error_nic_format">Enter 9 digits followed by V or X, or 12 digits.</string>
     <string name="error_full_name_required">Full name is required.</string>
-    <string name="error_full_name_too_short">Full name must be at least 3 characters.</string>
-    <string name="error_full_name_too_long">Full name must be 100 characters or fewer.</string>
     <string name="error_email_required">Email is required.</string>
-    <string name="error_email_format">Enter a valid email address.</string>
     <string name="error_phone_required">Phone number is required.</string>
-    <string name="error_phone_format">Phone number must be 10 digits starting with 0.</string>
     <string name="error_address_required">Address is required.</string>
-    <string name="error_address_too_long">Address must be 250 characters or fewer.</string>
     <string name="error_password_required">Password is required.</string>
-    <string name="error_password_too_short">Password must be at least 8 characters.</string>
     <string name="error_confirm_password_required">Please confirm your password.</string>
     <string name="error_passwords_do_not_match">Passwords do not match.</string>
+    <!-- Operator Mode strings -->
+    <string name="login_role_prosumer">Prosumer</string>
+    <string name="login_role_operator">Grid Operator</string>
+    <string name="login_operator_identifier_label">Email, username or phone</string>
+    <string name="login_operator_identifier_hint">operator@smartsolar.lk or operator</string>
+    <string name="operator_role_badge">GRID OPERATOR</string>
+
+    <!-- Operator Dashboard -->
+    <string name="operator_dashboard_title">Operator Console</string>
+    <string name="operator_dashboard_subtitle">Smart Solar Microgrid Dispatch Terminal</string>
+    <string name="operator_stat_pending">Pending</string>
+    <string name="operator_stat_approved">Approved</string>
+    <string name="operator_stat_completed">Completed</string>
+    <string name="operator_stat_total_kwh">Total Transferred</string>
+    <string name="operator_action_scan_qr">Scan Prosumer QR Code</string>
+    <string name="operator_action_scan_qr_desc">Scan transaction QR to verify booking and finalize transfer</string>
+    <string name="operator_action_reservations">Power Trading Bookings</string>
+    <string name="operator_action_reservations_desc">Monitor, search and filter all active and pending bookings</string>
+    <string name="operator_action_stations_map">Microgrid Stations Map</string>
+    <string name="operator_action_stations_map_desc">View nearby nodes, GPS positions and battery slot availability</string>
+    <string name="operator_recent_transfers_title">Recent Live Bookings</string>
+    <string name="operator_refresh">Refresh</string>
+
+    <!-- Operator QR Scanner -->
+    <string name="operator_scanner_title">Scan Prosumer QR</string>
+    <string name="operator_scanner_instruction">Position the prosumer\'s QR code within the scanner box</string>
+    <string name="operator_scanner_manual_entry">Enter Code Manually</string>
+    <string name="operator_scanner_gallery">Choose QR from Photos</string>
+    <string name="operator_scanner_demo_qr">Quick Test Demo QRs</string>
+    <string name="operator_scanner_verifying">Verifying against server…</string>
+    <string name="operator_scanner_hint">Enter reservation number (e.g. RES-20260922-A101) or token</string>
+    <string name="operator_scanner_verify_btn">Verify Reference</string>
+
+    <!-- Operator Verification & Finalization -->
+    <string name="operator_verify_title">Verify &amp; Finalize Transfer</string>
+    <string name="operator_verify_status_heading">Server Verification State</string>
+    <string name="operator_verify_prosumer_heading">Prosumer Profile</string>
+    <string name="operator_verify_energy_heading">Energy Transfer Specifications</string>
+    <string name="operator_verify_node_heading">Microgrid Station Details</string>
+    <string name="operator_verify_notes_label">Operator Transfer Notes (Optional)</string>
+    <string name="operator_verify_notes_hint">e.g. Inverter meter checked, transfer verified on site.</string>
+    <string name="operator_finalize_btn">Finalize Energy Transfer</string>
+    <string name="operator_finalizing">Finalizing transfer…</string>
+    <string name="operator_reject_btn">Reject / Cancel Transfer</string>
+
+    <!-- Job Complete Receipt -->
+    <string name="operator_complete_title">Transfer Finalized</string>
+    <string name="operator_complete_message">The energy transfer business logic has been successfully finalized and committed to the central API.</string>
+    <string name="operator_complete_scan_next">Scan Next Prosumer</string>
+    <string name="operator_complete_dashboard">Return to Dashboard</string>
+
+    <!-- Stations & Maps -->
+    <string name="operator_map_title">Microgrid Hub Stations</string>
+    <string name="operator_map_subtitle">Nearby Solar Microgrid Nodes</string>
+    <string name="operator_map_update_slots">Update Slots</string>
+    <string name="operator_map_navigate">Navigate (GPS)</string>
+    <string name="operator_map_available_slots">Available Battery Slots: %1$d / %2$d</string>
+    <string name="operator_map_capacity">Capacity: %1$.1f kW / %2$.1f kWh</string>
 </resources>

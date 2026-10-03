@@ -26,8 +26,14 @@ public interface IProsumerService
     /// <summary>Updates profile details if the caller is allowed to edit it.</summary>
     Task<ProsumerResponse> UpdateAsync(string nic, ProsumerUpdateRequest request, string callerId, string callerRole);
 
-    /// <summary>Deactivates a prosumer account.</summary>
+    /// <summary>Deactivates an account (staff) or requests deactivation (the prosumer themselves).</summary>
     Task<ProsumerResponse> DeactivateAsync(string nic, string callerId, string callerRole);
+
+    /// <summary>Approves a pending deactivation request (Backoffice only).</summary>
+    Task<ProsumerResponse> ApproveDeactivationAsync(string nic, string callerId, string callerRole);
+
+    /// <summary>Rejects a pending deactivation request, unblocking the account (Backoffice only).</summary>
+    Task<ProsumerResponse> RejectDeactivationAsync(string nic, string callerId, string callerRole);
 
     /// <summary>Reactivates a deactivated account (Backoffice only).</summary>
     Task<ProsumerResponse> ReactivateAsync(string nic, string callerId, string callerRole);

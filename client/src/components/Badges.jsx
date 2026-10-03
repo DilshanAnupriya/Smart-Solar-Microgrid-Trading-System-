@@ -43,7 +43,16 @@ export function StatusBadge({ isActive }) {
  * Shows whether a prosumer account is active or has been deactivated.
  */
 export function ProsumerStatusBadge({ status }) {
-  // The API sends the status as the text "Active" or "Deactivated"
+  // A blocked account waiting for a Backoffice decision gets its own amber pill
+  if (status === PROSUMER_STATUS.PENDING_DEACTIVATION) {
+    return (
+      <span className="badge rounded-pill border status-badge bg-warning-subtle text-warning-emphasis border-warning-subtle">
+        Deactivation requested
+      </span>
+    );
+  }
+
+  // Otherwise the API sends the status as the text "Active" or "Deactivated"
   const isActive = status === PROSUMER_STATUS.ACTIVE;
 
   return <StatusPill isActive={isActive} />;
@@ -64,6 +73,37 @@ function StatusPill({ isActive }) {
       }`}
     >
       {isActive ? 'Active' : 'Deactivated'}
+    </span>
+  );
+}
+
+/**
+ * Shows reservation status with contextual color coding.
+ */
+export function ReservationStatusBadge({ status }) {
+  const config = {
+    Approved: 'text-bg-success',
+    Pending: 'text-bg-warning',
+    Completed: 'text-bg-info',
+    Cancelled: 'text-bg-secondary',
+  };
+
+  return (
+    <span className={`badge rounded-pill ${config[status] || 'text-bg-light border'}`}>
+      {status}
+    </span>
+  );
+}
+
+/**
+ * Shows whether the power trading transaction is DropOff (feed-in) or Charging (draw).
+ */
+export function ReservationTypeBadge({ type }) {
+  const isDropOff = type === 'DropOff';
+
+  return (
+    <span className={`badge ${isDropOff ? 'bg-success-subtle text-success border border-success' : 'bg-primary-subtle text-primary border border-primary'}`}>
+      {isDropOff ? '⚡ Drop-off' : '🔋 Charging'}
     </span>
   );
 }

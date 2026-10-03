@@ -4,6 +4,8 @@
  * Layer:       Services
  * Author:      N. Jayasinghe (IT2XXXXXXX)
  * Created:     2026-09-20
+ * Modified:    2026-09-29 by N. Jayasinghe (IT2XXXXXXX) — added prosumer
+ *              login (NIC or email) for the Android app.
  * Description: Authentication business logic. Verifies credentials, blocks
  *              deactivated accounts from signing in, issues the JWT that carries
  *              the user's role, and handles password changes. All of these rules
@@ -12,28 +14,35 @@
  */
 
 using SmartSolar.Api.DTOs;
+using SmartSolar.Api.DTOs.Prosumers;
 using SmartSolar.Api.Exceptions;
+using SmartSolar.Api.Models;
 using SmartSolar.Api.Repositories;
 using SmartSolar.Api.Security;
+using SmartSolar.Api.Validators;
 
 namespace SmartSolar.Api.Services;
 
 public class AuthService : IAuthService
 {
     private readonly IWebUserRepository _repository;
+    private readonly IProsumerRepository _prosumerRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
 
     /// <summary>
-    /// Receives the repository, the password hasher and the token service.
+    /// Receives the web user and prosumer repositories, the password hasher and
+    /// the token service.
     /// </summary>
     public AuthService(
         IWebUserRepository repository,
+        IProsumerRepository prosumerRepository,
         IPasswordHasher passwordHasher,
         ITokenService tokenService)
     {
         // Store the collaborators this service needs
         _repository = repository;
+        _prosumerRepository = prosumerRepository;
         _passwordHasher = passwordHasher;
         _tokenService = tokenService;
     }
@@ -71,6 +80,55 @@ public class AuthService : IAuthService
             Token = token.Token,
             ExpiresAt = token.ExpiresAt,
             User = UserMapper.ToResponse(user)
+        };
+    }
+
+    /// <summary>
+    /// Verifies a prosumer's NIC (or email) and password and returns a signed
+    /// token. Used by the Android app.
+    /// </summary>
+    public async Task<ProsumerLoginResponseDto> ProsumerLoginAsync(ProsumerLoginRequestDto dto)
+    {
+        // An email address always contains "@" and a NIC never does, so that
+        // decides which lookup to use; both are normalised the same way they
+        // were when the prosumer registered
+        var identifier = dto.Identifier.Trim();
+        var prosumer = identifier.Contains('@')
+            ? await _prosumerRepository.GetByEmailAsync(identifier.ToLowerInvariant())
+            : await _prosumerRepository.GetByNicAsync(NicValidator.Normalize(identifier));
+
+        // Business rule: an unknown NIC or email and a wrong password produce the
+        // same message, so nobody can discover which NICs are registered
+        if (prosumer is null || !_passwordHasher.Verify(dto.Password, prosumer.PasswordHash))
+        {
+            throw new InvalidCredentialsException("Invalid NIC, email or password. Please check your details and try again.");
+        }
+
+        // Business rule: a deactivated prosumer may not sign in, even with the
+        // correct password, until a Backoffice officer reactivates the account
+        if (prosumer.Status == ProsumerStatus.Deactivated)
+        {
+            throw new AccountDeactivatedException(
+                "This account has been deactivated. Please contact a Backoffice officer to reactivate it.");
+        }
+
+        // Business rule: an account with an open deactivation request is blocked
+        // until a Backoffice officer approves or rejects the request
+        if (prosumer.Status == ProsumerStatus.PendingDeactivation)
+        {
+            throw new AccountDeactivatedException(
+                "Your deactivation request is waiting for Backoffice approval. The account is blocked until it is reviewed.");
+        }
+
+        // The token carries the NIC and the Prosumer role
+        var token = _tokenService.CreateToken(prosumer);
+
+        return new ProsumerLoginResponseDto
+        {
+            Token = token.Token,
+            ExpiresAt = token.ExpiresAt,
+            Role = UserRoles.Prosumer,
+            User = ProsumerResponse.FromModel(prosumer)
         };
     }
 

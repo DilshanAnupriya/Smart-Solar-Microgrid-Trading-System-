@@ -36,10 +36,14 @@ public class Prosumer
     [BsonElement("passwordHash")]
     public string PasswordHash { get; set; } = string.Empty;
 
-    // Saved as "Active" / "Deactivated" text so it is readable in Atlas
+    // Saved as "Active" / "PendingDeactivation" / "Deactivated" text so it is readable in Atlas
     [BsonElement("status")]
     [BsonRepresentation(BsonType.String)]
     public ProsumerStatus Status { get; set; } = ProsumerStatus.Active;
+
+    // When the prosumer asked for deactivation; null when there is no open request
+    [BsonElement("deactivationRequestedAt")]
+    public DateTime? DeactivationRequestedAt { get; set; }
 
     [BsonElement("deactivatedAt")]
     public DateTime? DeactivatedAt { get; set; }

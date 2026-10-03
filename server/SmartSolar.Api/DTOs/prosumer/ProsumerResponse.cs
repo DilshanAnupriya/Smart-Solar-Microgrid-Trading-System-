@@ -20,6 +20,7 @@ public class ProsumerResponse
     public string Phone { get; set; } = string.Empty;
     public string Address { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
+    public DateTime? DeactivationRequestedAt { get; set; }
     public DateTime? DeactivatedAt { get; set; }
     public string? DeactivatedBy { get; set; }
     public DateTime CreatedAt { get; set; }
@@ -39,6 +40,7 @@ public class ProsumerResponse
             Phone = prosumer.Phone,
             Address = prosumer.Address,
             Status = prosumer.Status.ToString(),
+            DeactivationRequestedAt = prosumer.DeactivationRequestedAt,
             DeactivatedAt = prosumer.DeactivatedAt,
             DeactivatedBy = prosumer.DeactivatedBy,
             CreatedAt = prosumer.CreatedAt,

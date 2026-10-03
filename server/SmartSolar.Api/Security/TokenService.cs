@@ -4,6 +4,8 @@
  * Layer:       Security
  * Author:      N. Jayasinghe (IT2XXXXXXX)
  * Created:     2026-09-20
+ * Modified:    2026-09-29 by N. Jayasinghe (IT2XXXXXXX) — added prosumer tokens
+ *              for the Android app and moved the signing into one shared method.
  * Description: Builds the signed JWT issued at login. The role is written into a
  *              ClaimTypes.Role claim, which is what makes the
  *              [Authorize(Roles = "Backoffice")] attribute work on a controller.
@@ -50,8 +52,6 @@ public class TokenService : ITokenService
     public TokenResult CreateToken(WebUser user)
     {
         // The claims are the facts about the user that travel inside the token
-        var expiresAt = DateTime.UtcNow.AddMinutes(_settings.ExpiryMinutes);
-
         var claims = new List<Claim>
         {
             // Unique id of this token, useful when debugging
@@ -67,6 +67,40 @@ public class TokenService : ITokenService
             // The role claim checked by [Authorize(Roles = "...")]
             new(ClaimTypes.Role, user.Role)
         };
+
+        return SignToken(claims);
+    }
+
+    /// <summary>
+    /// Creates a signed token for a prosumer signing in from the Android app.
+    /// </summary>
+    public TokenResult CreateToken(Prosumer prosumer)
+    {
+        // The NIC is the prosumer's id: ProsumerService compares this claim with
+        // the NIC in the URL, so a prosumer can only reach their own profile
+        var claims = new List<Claim>
+        {
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new(JwtRegisteredClaimNames.Sub, prosumer.Nic),
+            new(ClaimTypes.NameIdentifier, prosumer.Nic),
+
+            new(ClaimTypes.Name, prosumer.FullName),
+            new(ClaimTypes.Email, prosumer.Email),
+
+            // Every prosumer gets the same role, checked by [Authorize(Roles = "Prosumer")]
+            new(ClaimTypes.Role, UserRoles.Prosumer)
+        };
+
+        return SignToken(claims);
+    }
+
+    /// <summary>
+    /// Signs the claims with the configured key and sets the expiry time.
+    /// </summary>
+    private TokenResult SignToken(List<Claim> claims)
+    {
+        // Web user and prosumer tokens share the issuer, audience, key and lifetime
+        var expiresAt = DateTime.UtcNow.AddMinutes(_settings.ExpiryMinutes);
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.SecretKey));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

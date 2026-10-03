@@ -34,6 +34,8 @@ import NodeSlotsPage from './pages/nodes/NodeSlotsPage';
 import NodesListPage from './pages/nodes/NodesListPage';
 import UserFormPage from './pages/users/UserFormPage';
 import UsersListPage from './pages/users/UsersListPage';
+import ReservationsListPage from './pages/reservations/ReservationsListPage';
+import ReservationFormPage from './pages/reservations/ReservationFormPage';
 import { ROLES } from './utils/constants';
 
 export default function App() {
@@ -88,6 +90,13 @@ export default function App() {
           {/* Live battery availability is maintained by Grid Operators. */}
           <Route element={<RoleRoute allowed={[ROLES.GRID_OPERATOR]} />}>
             <Route path="nodes/:id/slots" element={<NodeSlotsPage />} />
+          </Route>
+
+          {/* Energy Slot Reservation Management: Backoffice and Grid Operator */}
+          <Route element={<RoleRoute allowed={[ROLES.BACKOFFICE, ROLES.GRID_OPERATOR]} />}>
+            <Route path="reservations" element={<ReservationsListPage />} />
+            <Route path="reservations/new" element={<ReservationFormPage />} />
+            <Route path="reservations/:id/edit" element={<ReservationFormPage />} />
           </Route>
 
           {/* Available to both roles */}

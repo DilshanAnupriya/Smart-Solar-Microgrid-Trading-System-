@@ -35,7 +35,13 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     // ZXing core: plain Java library used only to draw the reservation QR code
     implementation(libs.zxing.core)
+    // Coroutines: API calls run on Dispatchers.IO and their results come back on the main thread
+    implementation(libs.kotlinx.coroutines.android)
+    // Google Maps SDK for Android
+    implementation(libs.play.services.maps)
     testImplementation(libs.junit)
+    // Real org.json for JVM unit tests; the copy inside android.jar is only a stub there
+    testImplementation(libs.org.json)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
 }

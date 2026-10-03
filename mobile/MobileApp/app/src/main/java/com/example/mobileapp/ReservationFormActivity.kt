@@ -16,13 +16,24 @@ import android.widget.ImageButton
 import android.widget.RadioGroup
 import android.widget.ScrollView
 import android.widget.TextView
+import android.widget.Toast
+import com.example.mobileapp.network.ApiResult
+import com.example.mobileapp.network.NodeApi
+import com.example.mobileapp.network.ReservationApi
+import com.example.mobileapp.sessions.SessionManager
+import com.example.mobileapp.utils.BaseActivity
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 /**
  * Creates a new reservation, or modifies an existing one when started with a reservation id.
  * Enforces the 7-day window here for quick feedback; the API remains the real check.
  */
-class ReservationFormActivity : Activity() {
+class ReservationFormActivity : BaseActivity() {
 
     // Set when modifying; null when creating a new reservation
     private var editing: Reservation? = null
@@ -114,6 +125,15 @@ class ReservationFormActivity : Activity() {
 
         showPickedValues()
         showTypeHelp()
+
+        // Fetch latest active microgrid stations in background
+        uiScope.launch {
+            val nodeApi = NodeApi(this@ReservationFormActivity)
+            val result = nodeApi.getAll(isActive = true)
+            if (result is ApiResult.Success) {
+                ReservationStore.updateNodesFromStations(result.data)
+            }
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -277,21 +297,82 @@ class ReservationFormActivity : Activity() {
         val energyKwh = energyText.trim().toDouble()
         val reservation = editing
 
-        // UI only for now: POST /api/reservations or PUT /api/reservations/{id} goes here
-        val saved: Reservation?
-        val action: ReservationSummaryActivity.Action
-        if (reservation == null) {
-            saved = ReservationStore.create(node, selectedType(), startMillis, durationHours, energyKwh)
-            action = ReservationSummaryActivity.Action.CREATED
-        } else {
-            saved = ReservationStore.update(reservation.id, node, selectedType(), startMillis, durationHours, energyKwh)
-            action = ReservationSummaryActivity.Action.UPDATED
-        }
+        val btnSubmit = findViewById<Button>(R.id.btnSubmit)
+        btnSubmit.isEnabled = false
+        btnSubmit.text = getString(R.string.reservation_submitting)
 
-        if (saved != null) {
-            startActivity(ReservationSummaryActivity.createIntent(this, saved.id, action))
+        val typeStr = if (selectedType() == ReservationType.CHARGING) "Charging" else "DropOff"
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).apply {
+            timeZone = TimeZone.getTimeZone("UTC")
         }
-        finish()
+        val startUtc = sdf.format(Date(startMillis))
+        val endMillis = startMillis + durationHours * 3600_000L
+        val endUtc = sdf.format(Date(endMillis))
+
+        val currentUser = SessionManager(this).getCurrentUser()
+        val prosumerNic = currentUser?.nic
+        val prosumerName = currentUser?.fullName
+
+        uiScope.launch {
+            val api = ReservationApi(this@ReservationFormActivity)
+            if (reservation == null) {
+                val result = api.createReservation(
+                    nodeId = node.id,
+                    nodeName = node.name,
+                    slotStartTimeUtc = startUtc,
+                    slotEndTimeUtc = endUtc,
+                    energyAmountKWh = energyKwh,
+                    reservationType = typeStr,
+                    prosumerNic = prosumerNic,
+                    prosumerName = prosumerName
+                )
+                when (result) {
+                    is ApiResult.Success -> {
+                        val domainRes = ReservationStore.fromApiReservation(result.data)
+                        ReservationStore.addOrUpdate(domainRes)
+                        startActivity(
+                            ReservationSummaryActivity.createIntent(
+                                this@ReservationFormActivity,
+                                domainRes.id,
+                                ReservationSummaryActivity.Action.CREATED
+                            )
+                        )
+                        finish()
+                    }
+                    is ApiResult.Failure -> {
+                        btnSubmit.isEnabled = true
+                        btnSubmit.setText(R.string.reservation_submit_new)
+                        Toast.makeText(this@ReservationFormActivity, result.message, Toast.LENGTH_LONG).show()
+                    }
+                }
+            } else {
+                val result = api.updateReservation(
+                    id = reservation.id,
+                    slotStartTimeUtc = startUtc,
+                    slotEndTimeUtc = endUtc,
+                    energyAmountKWh = energyKwh
+                )
+                when (result) {
+                    is ApiResult.Success -> {
+                        val domainRes = ReservationStore.fromApiReservation(result.data)
+                        ReservationStore.addOrUpdate(domainRes)
+                        startActivity(
+                            ReservationSummaryActivity.createIntent(
+                                this@ReservationFormActivity,
+                                domainRes.id,
+                                ReservationSummaryActivity.Action.UPDATED
+                            )
+                        )
+                        finish()
+                    }
+                    is ApiResult.Failure -> {
+                        btnSubmit.isEnabled = true
+                        btnSubmit.setText(R.string.reservation_submit_modify)
+                        Toast.makeText(this@ReservationFormActivity, result.message, Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }
     }
 
     private fun showPickerError(errorView: TextView, errorRes: Int?) {

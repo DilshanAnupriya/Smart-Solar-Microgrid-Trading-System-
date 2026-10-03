@@ -33,16 +33,54 @@ export const STORAGE_KEYS = {
   USER: 'smartsolar.user',
 };
 
+// Reservation lifecycle states matching the API
+export const RESERVATION_STATUS = {
+  PENDING: 'Pending',
+  APPROVED: 'Approved',
+  COMPLETED: 'Completed',
+  CANCELLED: 'Cancelled',
+};
+
+export const RESERVATION_STATUS_LABELS = {
+  [RESERVATION_STATUS.PENDING]: 'Pending Approval',
+  [RESERVATION_STATUS.APPROVED]: 'Approved',
+  [RESERVATION_STATUS.COMPLETED]: 'Completed',
+  [RESERVATION_STATUS.CANCELLED]: 'Cancelled',
+};
+
+// Power trading transaction types
+export const RESERVATION_TYPES = {
+  DROP_OFF: 'DropOff',
+  CHARGING: 'Charging',
+};
+
+export const RESERVATION_TYPE_LABELS = {
+  [RESERVATION_TYPES.DROP_OFF]: 'Energy Drop-off (Feed-in)',
+  [RESERVATION_TYPES.CHARGING]: 'Battery Charging (Draw)',
+};
+
+// Standard reference microgrid nodes for booking selection
+export const REFERENCE_NODES = [
+  { id: 'NODE-COLOMBO-01', name: 'Colombo Central Hub (120 kWh)', capacity: 120, slots: 8 },
+  { id: 'NODE-KANDY-02', name: 'Kandy Hillcrest Station (80 kWh)', capacity: 80, slots: 6 },
+  { id: 'NODE-GALLE-01', name: 'Galle Coastal Solar Grid (150 kWh)', capacity: 150, slots: 10 },
+  { id: 'NODE-JAFFNA-03', name: 'Jaffna Northern Solar Park (200 kWh)', capacity: 200, slots: 12 },
+];
+
 // Prosumer account status, spelled exactly as the API's ProsumerStatus enum
-// serialises it. The API rejects anything other than these two words.
+// serialises it. The API rejects anything other than these three words.
+// PendingDeactivation means the prosumer asked to deactivate from the mobile
+// app: the account is blocked until a Backoffice officer approves or rejects.
 export const PROSUMER_STATUS = {
   ACTIVE: 'Active',
+  PENDING_DEACTIVATION: 'PendingDeactivation',
   DEACTIVATED: 'Deactivated',
 };
 
 // Used to build the status filter on the prosumer list page
 export const PROSUMER_STATUS_OPTIONS = [
   { value: PROSUMER_STATUS.ACTIVE, label: 'Active' },
+  { value: PROSUMER_STATUS.PENDING_DEACTIVATION, label: 'Deactivation requested' },
   { value: PROSUMER_STATUS.DEACTIVATED, label: 'Deactivated' },
 ];
 

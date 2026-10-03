@@ -39,9 +39,9 @@ public class NodesController : ControllerBase
         return Ok(ApiResponse<List<NodeResponseDto>>.Ok(result, $"{result.Count} node(s) found."));
     }
 
-    /// <summary>GET api/nodes/nearby — active nodes near a mobile prosumer.</summary>
+    /// <summary>GET api/nodes/nearby — active nodes near a mobile prosumer or operator.</summary>
     [HttpGet("nearby")]
-    [Authorize(Roles = "Prosumer")]
+    [Authorize(Roles = "Prosumer,GridOperator")]
     public async Task<IActionResult> GetNearby(
         [FromQuery] double latitude,
         [FromQuery] double longitude,

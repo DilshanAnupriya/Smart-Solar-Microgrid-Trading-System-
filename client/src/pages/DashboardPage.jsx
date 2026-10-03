@@ -19,6 +19,7 @@ import { RoleBadge, StatusBadge } from '../components/Badges';
 import { useAuth } from '../auth/useAuth';
 import { useToast } from '../toast/useToast';
 import { getUsers } from '../api/usersApi';
+import { getReservationStats } from '../api/reservationsApi';
 import { ROLES } from '../utils/constants';
 import { initialsOf } from '../utils/formatters';
 
@@ -26,6 +27,8 @@ import { initialsOf } from '../utils/formatters';
 const QUICK_ACTIONS = [
   { to: '/users/new', icon: 'plus', title: 'Add a user', text: 'Create a Backoffice or Grid Operator account' },
   { to: '/nodes/new', icon: 'plus', title: 'Add a node', text: 'Register a new microgrid hub' },
+  { to: '/reservations', icon: 'clock', title: 'Manage reservations', text: 'Power trading bookings and energy slots' },
+  { to: '/reservations/new', icon: 'plus', title: 'New energy booking', text: 'Book drop-off or charging energy slot' },
   { to: '/users', icon: 'users', title: 'Manage users', text: 'Search, edit, deactivate or reactivate accounts' },
   { to: '/nodes', icon: 'node', title: 'Manage nodes', text: 'Microgrid hubs, schedules and battery slots' },
   { to: '/prosumers', icon: 'sun', title: 'Prosumers', text: 'Review solar prosumer accounts' },
@@ -37,18 +40,22 @@ export default function DashboardPage() {
   const { showError } = useToast();
 
   const [users, setUsers] = useState([]);
+  const [reservationStats, setReservationStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
   /**
-   * Loads every web user so the summary cards can be calculated.
+   * Loads web users and reservation stats so summary cards can be calculated.
    */
-  const loadUsers = useCallback(async () => {
-    // The dashboard reads the same endpoint as the user list page
+  const loadDashboardData = useCallback(async () => {
     setLoading(true);
 
     try {
-      const data = await getUsers();
-      setUsers(data);
+      const [usersData, resStats] = await Promise.all([
+        getUsers(),
+        getReservationStats().catch(() => null),
+      ]);
+      setUsers(usersData);
+      setReservationStats(resStats);
     } catch (fetchError) {
       showError(fetchError.message);
     } finally {
@@ -57,8 +64,8 @@ export default function DashboardPage() {
   }, [showError]);
 
   useEffect(() => {
-    loadUsers();
-  }, [loadUsers]);
+    loadDashboardData();
+  }, [loadDashboardData]);
 
   // Recalculated only when the user list actually changes
   const stats = useMemo(() => {
@@ -129,6 +136,40 @@ export default function DashboardPage() {
               tone="secondary"
             />
           </div>
+
+          {/* Component 4: Power Trading Reservation Metrics */}
+          {reservationStats && (
+            <div className="row g-3 mb-4">
+              <StatCard
+                label="Active energy bookings"
+                value={reservationStats.approvedFutureReservations}
+                hint="Approved future slots"
+                icon="bolt"
+                tone="primary"
+              />
+              <StatCard
+                label="Pending slot approvals"
+                value={reservationStats.pendingReservations}
+                hint="Awaiting operator review"
+                icon="clock"
+                tone="warning"
+              />
+              <StatCard
+                label="Today's scheduled transfers"
+                value={reservationStats.todayReservations}
+                hint="Scheduled today"
+                icon="calendar"
+                tone="info"
+              />
+              <StatCard
+                label="Completed transfers"
+                value={reservationStats.completedReservations}
+                hint="Transfers fulfilled"
+                icon="shield"
+                tone="success"
+              />
+            </div>
+          )}
 
           <div className="row g-3">
             <div className="col-xl-7">
