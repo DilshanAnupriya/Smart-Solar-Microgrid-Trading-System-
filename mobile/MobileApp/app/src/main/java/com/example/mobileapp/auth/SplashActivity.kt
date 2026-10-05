@@ -13,8 +13,8 @@ package com.example.mobileapp.auth
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import com.example.mobileapp.DashboardActivity
 import com.example.mobileapp.models.LocalUser
-import com.example.mobileapp.profile.ProfileActivity
 import com.example.mobileapp.sessions.SessionManager
 
 /**
@@ -23,13 +23,13 @@ import com.example.mobileapp.sessions.SessionManager
 class SplashActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // A saved, unexpired prosumer session goes straight to the profile (the prosumer's home)
+        // A saved, unexpired session goes straight to the home screen for its role
         super.onCreate(savedInstanceState)
         val sessionManager = SessionManager(this)
         val next = if (sessionManager.hasValidSession()) {
             when (sessionManager.getRole()) {
                 LocalUser.ROLE_OPERATOR -> com.example.mobileapp.operator.OperatorDashboardActivity::class.java
-                LocalUser.ROLE_PROSUMER -> ProfileActivity::class.java
+                LocalUser.ROLE_PROSUMER -> DashboardActivity::class.java
                 else -> {
                     sessionManager.clearSession()
                     LoginActivity::class.java

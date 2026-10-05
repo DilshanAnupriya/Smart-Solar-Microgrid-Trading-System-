@@ -88,6 +88,29 @@
     <string name="profile_reservations_title">Energy reservations</string>
     <string name="profile_reservations_subtitle">Reserve, modify or cancel drop-off and charging slots</string>
 
+    <!-- Prosumer dashboard -->
+    <string name="dashboard_logo_description">Smart Solar dashboard</string>
+    <string name="dashboard_default_name">Prosumer</string>
+    <string name="dashboard_welcome">Welcome, %1$s</string>
+    <string name="dashboard_nic">Prosumer · NIC %1$s</string>
+    <string name="dashboard_booking_overview">Booking overview</string>
+    <string name="dashboard_refresh">Refresh</string>
+    <string name="dashboard_zero">0</string>
+    <string name="dashboard_pending_label">Pending</string>
+    <string name="dashboard_pending_help">Awaiting approval</string>
+    <string name="dashboard_approved_label">Approved</string>
+    <string name="dashboard_approved_help">Future bookings</string>
+    <string name="dashboard_next_booking">Next booking</string>
+    <string name="dashboard_no_upcoming">No upcoming bookings. Create one from My Bookings.</string>
+    <string name="dashboard_quick_actions">Quick actions</string>
+    <string name="dashboard_my_bookings">My Bookings</string>
+    <string name="dashboard_my_bookings_help">Create, update and review your energy bookings</string>
+    <string name="dashboard_nearby_nodes">Nearby Nodes</string>
+    <string name="dashboard_nearby_nodes_help">Find active microgrid stations and available slots</string>
+    <string name="dashboard_profile">Profile</string>
+    <string name="dashboard_profile_help">View and update your prosumer account</string>
+    <string name="dashboard_load_error">%1$s Tap here to try again.</string>
+
     <!-- Reservation values -->
     <string name="reservation_type_drop_off">Drop-off</string>
     <string name="reservation_type_charging">Charging</string>

@@ -5,7 +5,7 @@
  * Author:      N. Jayasinghe (IT2XXXXXXX)
  * Created:     2026-09-29
  * Description: Prosumer sign-in with NIC (or email) and password. On success the
- *              token and profile are saved in SQLite and the profile screen opens.
+ *              token and profile are saved in SQLite and the dashboard opens.
  */
 
 package com.example.mobileapp.auth
@@ -19,11 +19,11 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import com.example.mobileapp.DashboardActivity
 import com.example.mobileapp.R
 import com.example.mobileapp.models.LocalUser
 import com.example.mobileapp.network.ApiResult
 import com.example.mobileapp.network.AuthApi
-import com.example.mobileapp.profile.ProfileActivity
 import com.example.mobileapp.sessions.SessionManager
 import com.example.mobileapp.utils.BaseActivity
 import com.example.mobileapp.utils.UiUtils
@@ -209,7 +209,7 @@ class LoginActivity : BaseActivity() {
         val nextClass = if (role.equals(LocalUser.ROLE_OPERATOR, ignoreCase = true)) {
             com.example.mobileapp.operator.OperatorDashboardActivity::class.java
         } else {
-            ProfileActivity::class.java
+            DashboardActivity::class.java
         }
 
         startActivity(
