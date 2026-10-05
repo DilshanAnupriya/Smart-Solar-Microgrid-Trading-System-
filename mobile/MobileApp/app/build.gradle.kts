@@ -1,6 +1,21 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
 }
+
+// The shared Maps key belongs in ignored local.properties, a Gradle property,
+// or the MAPS_API_KEY environment variable. It is never committed to Git.
+val localMapsApiKey = providers.fileContents(
+    rootProject.layout.projectDirectory.file("local.properties")
+).asText.map { contents ->
+    Properties().apply { load(contents.reader()) }
+        .getProperty("MAPS_API_KEY", "")
+}
+val mapsApiKey = providers.gradleProperty("MAPS_API_KEY")
+    .orElse(providers.environmentVariable("MAPS_API_KEY"))
+    .orElse(localMapsApiKey)
+    .orElse("")
 
 android {
     namespace = "com.example.mobileapp"
@@ -14,6 +29,8 @@ android {
         targetSdk = 37
         versionCode = 1
         versionName = "1.0"
+
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey.get()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

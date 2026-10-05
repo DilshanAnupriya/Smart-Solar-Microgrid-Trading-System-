@@ -88,6 +88,29 @@
     <string name="profile_reservations_title">Energy reservations</string>
     <string name="profile_reservations_subtitle">Reserve, modify or cancel drop-off and charging slots</string>
 
+    <!-- Prosumer dashboard -->
+    <string name="dashboard_logo_description">Smart Solar dashboard</string>
+    <string name="dashboard_default_name">Prosumer</string>
+    <string name="dashboard_welcome">Welcome, %1$s</string>
+    <string name="dashboard_nic">Prosumer · NIC %1$s</string>
+    <string name="dashboard_booking_overview">Booking overview</string>
+    <string name="dashboard_refresh">Refresh</string>
+    <string name="dashboard_zero">0</string>
+    <string name="dashboard_pending_label">Pending</string>
+    <string name="dashboard_pending_help">Awaiting approval</string>
+    <string name="dashboard_approved_label">Approved</string>
+    <string name="dashboard_approved_help">Future bookings</string>
+    <string name="dashboard_next_booking">Next booking</string>
+    <string name="dashboard_no_upcoming">No upcoming bookings. Create one from My Bookings.</string>
+    <string name="dashboard_quick_actions">Quick actions</string>
+    <string name="dashboard_my_bookings">My Bookings</string>
+    <string name="dashboard_my_bookings_help">Create, update and review your energy bookings</string>
+    <string name="dashboard_nearby_nodes">Nearby Nodes</string>
+    <string name="dashboard_nearby_nodes_help">Find active microgrid stations and available slots</string>
+    <string name="dashboard_profile">Profile</string>
+    <string name="dashboard_profile_help">View and update your prosumer account</string>
+    <string name="dashboard_load_error">%1$s Tap here to try again.</string>
+
     <!-- Reservation values -->
     <string name="reservation_type_drop_off">Drop-off</string>
     <string name="reservation_type_charging">Charging</string>
@@ -113,6 +136,9 @@
     <string name="reservations_upcoming">Upcoming</string>
     <string name="reservations_past">Past and cancelled</string>
     <string name="reservations_empty">You have no reservations yet. Tap New to reserve an energy slot.</string>
+    <string name="reservations_search_hint">Search by booking number, node or type…</string>
+    <string name="reservations_filter_all">All</string>
+    <string name="reservations_no_matches">No bookings match your search and status filter.</string>
 
     <!-- New / modify reservation form -->
     <string name="reservation_form_new_title">New reservation</string>
@@ -235,6 +261,22 @@
     <string name="operator_complete_dashboard">Return to Dashboard</string>
 
     <!-- Stations & Maps -->
+    <string name="back">Back</string>
+    <string name="close">Close</string>
+    <string name="prosumer_map_title">Nearby Microgrid Nodes</string>
+    <string name="prosumer_map_locating">Getting your phone location…</string>
+    <string name="prosumer_map_searching">Searching within %1$.0f km…</string>
+    <string name="prosumer_map_nodes_found">%1$d active node(s) within %2$.0f km</string>
+    <string name="prosumer_map_retry_help">Tap the message to try again</string>
+    <string name="prosumer_map_permission_required">Location permission is needed to find microgrid nodes near you. Tap here to try again.</string>
+    <string name="prosumer_map_location_disabled">Turn on phone location services, then tap here to try again.</string>
+    <string name="prosumer_map_location_unavailable">Your location could not be detected. Move to an open area and tap here to retry.</string>
+    <string name="prosumer_map_load_error">Could not load nearby nodes: %1$s Tap here to retry.</string>
+    <string name="prosumer_map_marker_slots">Available slots: %1$d / %2$d</string>
+    <string name="prosumer_map_distance">%1$.1f km away</string>
+    <string name="prosumer_map_available_slots">Available battery slots: %1$d / %2$d</string>
+    <string name="prosumer_map_capacity">Generation: %1$.1f kW · Storage: %2$.1f kWh</string>
+    <string name="prosumer_map_navigate">Navigate to node</string>
     <string name="operator_map_title">Microgrid Hub Stations</string>
     <string name="operator_map_subtitle">Nearby Solar Microgrid Nodes</string>
     <string name="operator_map_update_slots">Update Slots</string>

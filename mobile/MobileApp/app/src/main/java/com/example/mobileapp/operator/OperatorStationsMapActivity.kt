@@ -116,8 +116,15 @@ class OperatorStationsMapActivity : FragmentActivity(), OnMapReadyCallback {
     }
 
     private fun setupGoogleMap() {
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as? SupportMapFragment
-        mapFragment?.getMapAsync(this)
+        var mapFragment = supportFragmentManager
+            .findFragmentById(R.id.mapFragment) as? SupportMapFragment
+        if (mapFragment == null) {
+            mapFragment = SupportMapFragment.newInstance()
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.mapFragment, mapFragment)
+                .commitNow()
+        }
+        mapFragment.getMapAsync(this)
     }
 
     override fun onMapReady(map: GoogleMap) {
@@ -148,7 +155,9 @@ class OperatorStationsMapActivity : FragmentActivity(), OnMapReadyCallback {
         tvStationsCount.text = "Loading stations…"
 
         lifecycleScope.launch {
-            when (val result = nodeApi.getAll(isActive = true)) {
+            val result = nodeApi.getAll(isActive = true)
+
+            when (result) {
                 is ApiResult.Success -> {
                     progressMapLoading.visibility = View.GONE
                     stationList.clear()
@@ -339,4 +348,5 @@ class OperatorStationsMapActivity : FragmentActivity(), OnMapReadyCallback {
             startActivity(Intent(Intent.ACTION_VIEW, geoUri))
         }
     }
+
 }

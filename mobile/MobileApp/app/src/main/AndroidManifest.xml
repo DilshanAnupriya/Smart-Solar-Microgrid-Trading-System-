@@ -30,7 +30,7 @@
         <!-- Google Maps API Key metadata -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDummyKeyForBuildValidation000000" />
+            android:value="${MAPS_API_KEY}" />
 
         <!-- Entry point: reads the saved session and opens the right screen -->
         <activity
@@ -54,6 +54,12 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".profile.ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".DashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ProsumerNodesMapActivity"
             android:exported="false" />
         <activity
             android:name=".profile.EditProfileActivity"
