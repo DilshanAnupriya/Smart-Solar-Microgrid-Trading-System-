@@ -12,7 +12,6 @@
 package com.example.mobileapp.operator
 
 import android.app.AlertDialog
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -63,7 +62,6 @@ class OperatorStationsMapActivity : FragmentActivity(), OnMapReadyCallback {
     private lateinit var btnNavigateGps: Button
 
     private lateinit var nodeApi: NodeApi
-    private var isProsumerMode = false
     private var googleMap: GoogleMap? = null
     private val stationList = mutableListOf<MicrogridStation>()
     private val markerStationMap = HashMap<Marker, MicrogridStation>()
@@ -74,11 +72,8 @@ class OperatorStationsMapActivity : FragmentActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_operator_stations_map)
 
         nodeApi = NodeApi(this)
-        isProsumerMode = intent.getBooleanExtra(EXTRA_PROSUMER_MODE, false)
 
         initViews()
-        // Prosumers can inspect locations and availability, but only operators may change slots.
-        btnUpdateStationSlots.visibility = if (isProsumerMode) View.GONE else View.VISIBLE
         setupListeners()
         setupGoogleMap()
         loadStations()
@@ -121,8 +116,15 @@ class OperatorStationsMapActivity : FragmentActivity(), OnMapReadyCallback {
     }
 
     private fun setupGoogleMap() {
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as? SupportMapFragment
-        mapFragment?.getMapAsync(this)
+        var mapFragment = supportFragmentManager
+            .findFragmentById(R.id.mapFragment) as? SupportMapFragment
+        if (mapFragment == null) {
+            mapFragment = SupportMapFragment.newInstance()
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.mapFragment, mapFragment)
+                .commitNow()
+        }
+        mapFragment.getMapAsync(this)
     }
 
     override fun onMapReady(map: GoogleMap) {
@@ -153,13 +155,7 @@ class OperatorStationsMapActivity : FragmentActivity(), OnMapReadyCallback {
         tvStationsCount.text = "Loading stations…"
 
         lifecycleScope.launch {
-            // The nearby endpoint accepts prosumer tokens. A Sri Lanka-wide radius keeps the
-            // map useful until live device-location centring is requested by the user.
-            val result = if (isProsumerMode) {
-                nodeApi.getNearby(SRI_LANKA_LATITUDE, SRI_LANKA_LONGITUDE, SRI_LANKA_RADIUS_KM)
-            } else {
-                nodeApi.getAll(isActive = true)
-            }
+            val result = nodeApi.getAll(isActive = true)
 
             when (result) {
                 is ApiResult.Success -> {
@@ -353,15 +349,4 @@ class OperatorStationsMapActivity : FragmentActivity(), OnMapReadyCallback {
         }
     }
 
-    companion object {
-        private const val EXTRA_PROSUMER_MODE = "prosumer_read_only"
-        private const val SRI_LANKA_LATITUDE = 7.8731
-        private const val SRI_LANKA_LONGITUDE = 80.7718
-        private const val SRI_LANKA_RADIUS_KM = 250.0
-
-        /** Opens the existing stations map without operator-only slot controls. */
-        fun prosumerIntent(context: Context): Intent =
-            Intent(context, OperatorStationsMapActivity::class.java)
-                .putExtra(EXTRA_PROSUMER_MODE, true)
-    }
 }

@@ -136,6 +136,9 @@
     <string name="reservations_upcoming">Upcoming</string>
     <string name="reservations_past">Past and cancelled</string>
     <string name="reservations_empty">You have no reservations yet. Tap New to reserve an energy slot.</string>
+    <string name="reservations_search_hint">Search by booking number, node or type…</string>
+    <string name="reservations_filter_all">All</string>
+    <string name="reservations_no_matches">No bookings match your search and status filter.</string>
 
     <!-- New / modify reservation form -->
     <string name="reservation_form_new_title">New reservation</string>
@@ -258,6 +261,22 @@
     <string name="operator_complete_dashboard">Return to Dashboard</string>
 
     <!-- Stations & Maps -->
+    <string name="back">Back</string>
+    <string name="close">Close</string>
+    <string name="prosumer_map_title">Nearby Microgrid Nodes</string>
+    <string name="prosumer_map_locating">Getting your phone location…</string>
+    <string name="prosumer_map_searching">Searching within %1$.0f km…</string>
+    <string name="prosumer_map_nodes_found">%1$d active node(s) within %2$.0f km</string>
+    <string name="prosumer_map_retry_help">Tap the message to try again</string>
+    <string name="prosumer_map_permission_required">Location permission is needed to find microgrid nodes near you. Tap here to try again.</string>
+    <string name="prosumer_map_location_disabled">Turn on phone location services, then tap here to try again.</string>
+    <string name="prosumer_map_location_unavailable">Your location could not be detected. Move to an open area and tap here to retry.</string>
+    <string name="prosumer_map_load_error">Could not load nearby nodes: %1$s Tap here to retry.</string>
+    <string name="prosumer_map_marker_slots">Available slots: %1$d / %2$d</string>
+    <string name="prosumer_map_distance">%1$.1f km away</string>
+    <string name="prosumer_map_available_slots">Available battery slots: %1$d / %2$d</string>
+    <string name="prosumer_map_capacity">Generation: %1$.1f kW · Storage: %2$.1f kWh</string>
+    <string name="prosumer_map_navigate">Navigate to node</string>
     <string name="operator_map_title">Microgrid Hub Stations</string>
     <string name="operator_map_subtitle">Nearby Solar Microgrid Nodes</string>
     <string name="operator_map_update_slots">Update Slots</string>

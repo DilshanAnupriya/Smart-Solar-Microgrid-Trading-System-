@@ -1,0 +1,4 @@
+# Copy this file to local.properties and use the Android SDK path for your machine.
+# local.properties is ignored by Git, so the group's real Maps key is not committed.
+sdk.dir=/path/to/Android/sdk
+MAPS_API_KEY=replace_with_the_group_google_maps_key

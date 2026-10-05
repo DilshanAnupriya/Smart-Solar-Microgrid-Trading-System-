@@ -20,7 +20,6 @@ import android.widget.TextView
 import com.example.mobileapp.models.LocalUser
 import com.example.mobileapp.network.ApiResult
 import com.example.mobileapp.network.ReservationApi
-import com.example.mobileapp.operator.OperatorStationsMapActivity
 import com.example.mobileapp.profile.ProfileActivity
 import com.example.mobileapp.sessions.SessionManager
 import com.example.mobileapp.utils.BaseActivity
@@ -130,7 +129,7 @@ class DashboardActivity : BaseActivity() {
             startActivity(Intent(this, ReservationsActivity::class.java))
         }
         cardNearbyNodes.setOnClickListener {
-            startActivity(OperatorStationsMapActivity.prosumerIntent(this))
+            startActivity(Intent(this, ProsumerNodesMapActivity::class.java))
         }
         cardProfile.setOnClickListener {
             startActivity(Intent(this, ProfileActivity::class.java))

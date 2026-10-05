@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- My reservations: top bar with a New button, then the list grouped into
-     upcoming and past reservations (rows are added in code) -->
+<!-- My reservations: search and status filters are applied locally to the live API results,
+     which remain grouped into upcoming and past sections. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -30,6 +30,108 @@
 
     <View style="@style/Divider" />
 
+    <!-- Search by the booking details the prosumer can see in the list. -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp">
+
+        <EditText
+            android:id="@+id/etSearchReservations"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_input"
+            android:hint="@string/reservations_search_hint"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:maxLines="1"
+            android:paddingHorizontal="12dp"
+            android:textColor="@color/text_dark"
+            android:textColorHint="@color/text_muted"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <!-- Horizontal buttons keep every reservation status available on small phones. -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="12dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/filterAll"
+                style="@style/ButtonOutline"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/bg_role_tab_active"
+                android:minWidth="0dp"
+                android:text="@string/reservations_filter_all"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/filterPending"
+                style="@style/ButtonOutline"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/bg_btn_outline"
+                android:minWidth="0dp"
+                android:text="@string/reservation_status_pending"
+                android:textColor="@color/text_dark"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/filterApproved"
+                style="@style/ButtonOutline"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/bg_btn_outline"
+                android:minWidth="0dp"
+                android:text="@string/reservation_status_approved"
+                android:textColor="@color/text_dark"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/filterCompleted"
+                style="@style/ButtonOutline"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/bg_btn_outline"
+                android:minWidth="0dp"
+                android:text="@string/reservation_status_completed"
+                android:textColor="@color/text_dark"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/filterCancelled"
+                style="@style/ButtonOutline"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_btn_outline"
+                android:minWidth="0dp"
+                android:text="@string/reservation_status_cancelled"
+                android:textColor="@color/text_dark"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <View style="@style/Divider" />
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -50,6 +152,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="48dp"
                 android:gravity="center"
+                android:paddingHorizontal="24dp"
                 android:text="@string/reservations_empty"
                 android:textColor="@color/text_muted"
                 android:textSize="15sp"
